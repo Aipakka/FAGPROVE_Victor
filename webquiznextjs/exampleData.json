@@ -1,0 +1,69 @@
+[
+    {
+        "quizName": "programering",
+        "categories": [
+            {
+                "categoryName": "syntax",
+                "questions": [
+                    {
+                        "question": "Hvordan definerer du en variabel som ikke kan endres?",
+                        "answers": [
+                            {
+                                "answer": "const",
+                                "correct": true
+                            },
+                            {
+                                "answer": "let",
+                                "correct": false
+                            }
+                        ]
+                    },
+                    {
+                        "question": "Hva er ikke en array funksjon",
+                        "answers": [
+                            {
+                                "answer": "Array.some()",
+                                "correct": false
+                            },
+                            {
+                                "answer": "Array.all()",
+                                "correct": true
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "categoryName": "språk",
+                "questions": [
+                    {
+                        "question": "Hvilket er ikke et variant av javascript?",
+                        "answers": [
+                            {
+                                "answer": "python",
+                                "correct": true
+                            },
+                            {
+                                "answer": "JSFuck",
+                                "correct": false
+                            }
+                        ]
+                    },
+                    {
+                        "question": "Hvor mange tegn trengs for å skrive JSFuck?",
+                        "answers": [
+                            {
+                                "answer": "6 karakterer",
+                                "correct": true
+                            },
+                            {
+                                "answer": "Hele alfabetet",
+                                "correct": false
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
