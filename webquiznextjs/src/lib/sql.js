@@ -46,4 +46,27 @@ export default class SQL {
             return 'error'
         }
     }
+
+    //SQL SELECT henter alle quizer
+    static async GetQuizes() {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            const result = await sql.query(`SELECT ("idQuiz", "quizName", "description") FROM "quiz"`);
+            return result
+        } catch (error) {
+            console.log('SQL error: ', error);
+            return 'error'
+        }
+    }
+    //SQL SELECT henter alle quizer
+    static async InsertQuizez() {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            const result = await sql.query(`INSERT INTO "quiz" ("idQuiz", "quizName", "description") values ($1, "`);
+            return result
+        } catch (error) {
+            console.log('SQL error: ', error);
+            return 'error'
+        }
+    }
 }

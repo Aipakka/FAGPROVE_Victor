@@ -1,15 +1,16 @@
 "use client"
-import { useState } from 'react';
-export default function ClientIndex({tempCreateAdmin}) {
-  const [show, setShow] = useState('før kjlring')
+import { useEffect, useState } from 'react';
+export default function ClientIndex({GetQuizez}) {
+  const [quizlist, setQuizlist] = useState([])
+  useEffect(()=> {wrapper()})
+
   async function wrapper() {
-    setShow(await tempCreateAdmin())
+    setQuizlist(await GetQuizez())
   }
 
 
   return (
     <>
-      <button onClick={() => wrapper()}>{show}</button >
     </>
   );
 }
