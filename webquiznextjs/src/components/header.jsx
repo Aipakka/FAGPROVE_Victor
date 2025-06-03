@@ -77,7 +77,7 @@ export default function Header({readFileToDB,  adminName, admin = false, VerifyL
         <>
             {modal === 'login' ? loginModal() : <></>}
             {modal === 'filModal' ? filModal() : <></>}
-            <header className=' absolute top-0 flex flex-row bg-green-900 h-16 justify-between  w-full border-b-8 border-b-slate-400'>
+            <header className='fixed top-0 flex flex-row bg-green-900 h-16 justify-between  w-full border-b-8 border-b-slate-400'>
                 <div className='justify-start h-full'>
                     <button className='hover:bg-green-600 h-full w-32 items-center justify-center'>
                         <p className='flex flex-col justify-center text-white'>{adminName}</p>

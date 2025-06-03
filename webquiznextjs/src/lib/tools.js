@@ -82,10 +82,18 @@ export async function InsertQuizLoop(quizList) {
 }
 async function QuizezInList(quizList) {
     try {
+        const userCookies = await cookies();
+        const session = await getIronSession(userCookies, {
+            password: process.env.SESSION_PWD,
+            cookieName: 'session',
+            cookieOptions: {
+                maxAge: 60 * 30
+            }
+        });
         await quizList.forEach(async quiz => {
             if (!Array.isArray(quiz.categories) && quiz.categories !== undefined && quiz.categories !== null)
                 quiz.categories = [quiz.categories];
-            let quizID = await SQL.InsertQuiz(quiz.quizName, quiz.description)
+            let quizID = await SQL.InsertQuiz(quiz.quizName, quiz.description, session.idUser)
             await CategoriesInQuiz(quiz, quizID);
 
         });
@@ -95,18 +103,11 @@ async function QuizezInList(quizList) {
 }
 async function CategoriesInQuiz(quiz, quizID) {
     try {
-          const userCookies = await cookies();
-            const session = await getIronSession(userCookies, {
-                password: process.env.SESSION_PWD,
-                cookieName: 'session',
-                cookieOptions: {
-                    maxAge: 60 * 30
-                }
-            });
+
         await quiz.categories.forEach(async category => {
             if (!Array.isArray(category.questions) && category.questions !== undefined && category.questions !== null)
                 category.questions = [category.questions];
-            let categoryID = await SQL.InsertCategory(category.categoryName, quizID, session.idUser)
+            let categoryID = await SQL.InsertCategory(category.categoryName, quizID)
             await QuestionsInCategory(category, categoryID);
         });
     } catch (error) {

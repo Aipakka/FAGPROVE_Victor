@@ -45,9 +45,12 @@ export default async function RootLayout({ children }) {
   // console.log('admnm: ', admName)
   return (
     <html lang="en" >
-      <body className={`flex w-[100dvw] h-[100dvh]`}>
+
+      <body  style={{marginTop: '72px'}}>
         <Header adminName={admName[0]?.username} admin={session.admin} VerifyLoginn={ServerWrapperLoginn} destroySession={ServerWrapperdestroySession} readFileToDB={ServerWrapperInsertQuizLoop}/>
+<main className={`flex flex-col w-[100dvw] h-[100dvh] items-center `}>
         {children}
+        </main>
       </body>
     </html >
   );
