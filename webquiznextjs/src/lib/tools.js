@@ -82,10 +82,10 @@ export async function InsertQuizLoop(quizList) {
 }
 async function QuizezInList(quizList) {
     try {
-        quizList.forEach(async quiz => {
+        await quizList.forEach(async quiz => {
             if (!Array.isArray(quiz.categories) && quiz.categories !== undefined && quiz.categories !== null)
                 quiz.categories = [quiz.categories];
-            let quizID = SQL.InsertQuiz(quiz.quizName, quiz.description)
+            let quizID = await SQL.InsertQuiz(quiz.quizName, quiz.description)
             await CategoriesInQuiz(quiz, quizID);
 
         });
@@ -95,10 +95,18 @@ async function QuizezInList(quizList) {
 }
 async function CategoriesInQuiz(quiz, quizID) {
     try {
-        quiz.categories.forEach(async category => {
+          const userCookies = await cookies();
+            const session = await getIronSession(userCookies, {
+                password: process.env.SESSION_PWD,
+                cookieName: 'session',
+                cookieOptions: {
+                    maxAge: 60 * 30
+                }
+            });
+        await quiz.categories.forEach(async category => {
             if (!Array.isArray(category.questions) && category.questions !== undefined && category.questions !== null)
                 category.questions = [category.questions];
-            let categoryID = SQL.InsertCategory(category.categoryName, quizID)
+            let categoryID = await SQL.InsertCategory(category.categoryName, quizID, session.idUser)
             await QuestionsInCategory(category, categoryID);
         });
     } catch (error) {
@@ -107,7 +115,7 @@ async function CategoriesInQuiz(quiz, quizID) {
 }
 async function QuestionsInCategory(category, categoryID) {
     try {
-        category.questions.forEach(async question => {
+        await category.questions.forEach(async question => {
             if (!Array.isArray(question.answers) && question.answers !== undefined && question.answers !== null)
                 question.answers = [question.answers];
             let questionID = await SQL.InsertQuestion(question.question, categoryID)
@@ -120,7 +128,7 @@ async function QuestionsInCategory(category, categoryID) {
 }
 async function AnswersToQuestion(question, questionID) {
     try {
-        question.answers.forEach(async answer => {
+        await question.answers.forEach(async answer => {
             await SQL.InsertOption(answer.text, answer.correct, questionID)
         });
     } catch (error) {

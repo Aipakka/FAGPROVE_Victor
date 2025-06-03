@@ -42,7 +42,7 @@ export default async function RootLayout({ children }) {
     }
   })
   const admName = await SQL.GetUserFromID(session.idUser)
-  console.log('admnm: ', admName)
+  // console.log('admnm: ', admName)
   return (
     <html lang="en" >
       <body className={`flex w-[100dvw] h-[100dvh]`}>

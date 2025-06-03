@@ -72,15 +72,13 @@ export default class SQL {
         }
     }
     //SQL INSERT for en en quiz
-    static async InsertQuiz(quizName, description) {
+    static async InsertQuiz(quizName, description, idUser) {
         try {
             const sql = neon(process.env.DATABASE_URL);
-            await sql.query(`INSERT INTO "quiz" ("quizName", "description") values ($1, $2)"`, [String(quizName), String(description)]);
-            const result = await sql.query(`SELECT "idQuiz" FROM "questions WHERE "quizName" = $1 AND "description" = $2`, [String(quizName), String(description)])
-            console.log('IQu res: ', result)
-            return result.idQuiz
+            await sql.query(`INSERT INTO "quiz" ("quizName", "description") values ($1, $2)`, [String(quizName), String(description), Number(idUser)]);
+            const result = await sql.query(`SELECT "idQuiz" FROM "quiz" WHERE "quizName" = $1 AND "description" = $2`, [String(quizName), String(description)])
+            return result[0].idQuiz
         } catch (error) {
-            console.log('InsertQuiz: ', quizName, description)
             console.log('SQL error: ', error);
             return 'error'
         }
@@ -90,11 +88,9 @@ export default class SQL {
         try {
             const sql = neon(process.env.DATABASE_URL);
             await sql.query(`INSERT INTO "categories" ( "categoryName", "parentQuizID") values ($1, $2)`, [String(categoryName), Number(parentID)]);
-            const result = await sql.query(`SELECT "idCategories" FROM "questions WHERE "categoryName" = $1 AND "parentQuizID" = $2`, [String(categoryName), Number(parentID)])
-            console.log('IC res: ', result)
-            return result.idCategories
+            const result = await sql.query(`SELECT "idCategories" FROM "categories" WHERE "categoryName" = $1 AND "parentQuizID" = $2`, [String(categoryName), Number(parentID)])
+            return result[0].idCategories
         } catch (error) {
-            console.info('InsertCategory: ', categoryName, parentID)
             console.log('SQL error: ', error);
             return 'error'
         }
@@ -104,11 +100,9 @@ export default class SQL {
         try {
             const sql = neon(process.env.DATABASE_URL);
             await sql.query(`INSERT INTO "questions" ("question", "parentCategoryID") values ($1, $2)`, [String(question), Number(parentID)]);
-            const result = await sql.query(`SELECT "idQuestion" FROM "questions WHERE "question" = $1 AND "parentCategoryID" = $2`, [String(question), Number(parentID)])
-            console.log('IQ res: ', result)
-            return result.idQuestion
+            const result = await sql.query(`SELECT "idQuestion" FROM "questions" WHERE "question" = $1 AND "parentCategoryID" = $2`, [String(question), Number(parentID)])
+            return result[0].idQuestion
         } catch (error) {
-            console.info('InsertQuestion: ', question, parentID)
             console.log('SQL error: ', error);
             return 'error'
         }
@@ -120,7 +114,6 @@ export default class SQL {
             const result = await sql.query(`INSERT INTO "questionOptions" ("optionText", "parentQuestionID", "correctAnswer") values ($1, $2, $3)`, [String(optionText), Number(parentID), Boolean(correctAnswer)]);
             return result
         } catch (error) {
-            console.log('InsertOption: ', optionText, correctAnswer, parentID)
             console.log('SQL error: ', error);
             return 'error'
         }
