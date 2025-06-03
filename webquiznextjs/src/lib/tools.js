@@ -1,6 +1,7 @@
+"use server"
 import { getIronSession } from 'iron-session';
 import bcrypt from "bcrypt"
-
+import SQL from './sql';
 
 //Logger inn bruker
 //henter ut passord hash Basert på brukernavn skrevet inn
@@ -8,15 +9,17 @@ import bcrypt from "bcrypt"
 //blir gjort gjennom bcrypt.compare(passord, hash)
 //om loginn er valid setter session gjennom iron-session 
 export async function VerifyLoginn(username, password) {
+    console.log('username tools:', username)
     const dbPassword = await SQL.GetUserPassword(username);
-    if (!dbPassword[0].Password)
+    console.info('dbpwd: ', dbPassword)
+    if (!dbPassword[0].passwordHash)
         return 'noUserFound';
-    const passwordHash = dbPassword[0].Password;
+    const passwordHash = dbPassword[0].passwordHash;
     
     if (await bcrypt.compare(password, passwordHash)) {
 
-        const simpleUserData = await SQL.GetUserWithUserAndPass(username, passwordHash);
-        if (simpleUserData === 'error')
+        const userData = await SQL.GetUserWithUserAndPass(username, passwordHash);
+        if (userData === 'error')
             return 'sqlErr'
         try {
             const userCookies = await cookies();
@@ -28,9 +31,9 @@ export async function VerifyLoginn(username, password) {
                 }
             });
 
-            //session verdier, session."name" bliur opprettet av session om det ikke eksisterer
-            session.idUser = simpleUserData[0].idUsers;
-            session.admin = simpleUserData[0].admin;
+            //session verdier, session."variabelNavn" blir opprettet av session om det ikke eksisterer
+            session.idUser = userData[0].idUsers;
+            session.admin = userData[0].admin;
             return 'loginnSuccess'
         } catch (error) {
             console.log(error)
