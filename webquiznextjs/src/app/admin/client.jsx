@@ -1,3 +1,3 @@
 export default function AdminClient(){
-    return<></>
+    return<><div>content</div></>
 }

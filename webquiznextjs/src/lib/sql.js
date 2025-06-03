@@ -38,11 +38,9 @@ export default class SQL {
     //SQL SELECT for å hente brukers passord fra databasen, for å verifisere loginn
     static async GetUserPassword(username) {
         try {
-            console.log(username)
             const sql = neon(process.env.DATABASE_URL);
             const result = await sql.query(`SELECT "passwordHash" FROM "users" WHERE "username" = $1`, [username]);
             // const result = await sql.query(`SELECT "passwordHash" FROM "users" `);
-            console.log('sqllog: ', result)
             return result
         } catch (error) {
             console.log('SQL error: ', error);

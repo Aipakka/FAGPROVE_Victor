@@ -9,7 +9,7 @@ export async function middleware(request) {
             password: process.env.SESSION_PWD,
             cookieName: 'session',
         });
-
+        console.log('MW:',session)
         if (!session.admin ) {
             if (request.nextUrl.pathname.startsWith("/admin") && session.userLevel != 10) {
                 session.destroy()
