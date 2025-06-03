@@ -1,18 +1,54 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 
-export default function Header({ admin = false, VerifyLoginn }) {
+export default function Header({readFileToDB,  adminName, admin = false, VerifyLoginn, destroySession }) {
     const [modal, setModal] = useState('')
     const [passord, setPassord] = useState('')
     const [username, setUsername] = useState('')
     const [pwdShow, setpwdShow] = useState('password')
-    const router = useRouter();
-    function openLogin() {
+    const [file, setFile] = useState(undefined)
+    const fileRead = useRef([])
+    function asyncFileReader(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader;
+            reader.onload = (evt) => {
+                console.log('res bf: ', evt.target.result);
+                resolve(fileRead.current = JSON.parse(evt.target.result));
 
-        setModal('login')
+            };
+            reader.readAsText(file)
+        });
+             
+    }
+    async function ReadFile(file) {
+        await asyncFileReader(file);
+    }
+    useEffect(() => {
+        if (file != undefined) {
+            ReadFile(file);
+        }
+    }, [file])
+    const router = useRouter();
+    function modifyModal(modalName) {
+        switch (modalName) {
+            case 'login':
+                setModal('login')
+                break;
+            case 'filModal':
+                setModal('filModal')
+                break;
+            default:
+                setModal('')
+                break;
+        }
+
+    }
+    async function destroy() {
+        await destroySession();
+        router.replace('/');
     }
     async function Loginn() {
         console.log('client:', username)
@@ -28,38 +64,52 @@ export default function Header({ admin = false, VerifyLoginn }) {
         }
 
     }
+    async function uploadFile() {
+       const res = await readFileToDB(fileRead.current);
+       if (res === 'fileReadToDBsuccess'){
+        fileRead.current = [];
+        setFile(undefined);
+        setModal(false);
+       }
+    }
 
     return (
         <>
             {modal === 'login' ? loginModal() : <></>}
-            {modal === 'login' ? filModal() : <></>}
+            {modal === 'filModal' ? filModal() : <></>}
             <header className=' absolute top-0 flex flex-row bg-green-900 h-16 justify-between  w-full border-b-8 border-b-slate-400'>
                 <div className='justify-start h-full'>
                     <button className='hover:bg-green-600 h-full w-32 items-center justify-center'>
-                        <p className='flex flex-col justify-center text-white'>Testing left</p>
-                        <p className='flex flex-col justify-center text-white'>{username}</p>
-                        <p className='flex flex-col justify-center text-white'>{passord}</p>
+                        <p className='flex flex-col justify-center text-white'>{adminName}</p>
                     </button>
+                    <p id='breadtoekn' className='absolute flex flex-col justify-center text-white'></p>
+
                 </div>
                 <div className='justify-end'>
                     {admin ?
-                        <button className='hover:bg-green-600 h-full w-32 items-center justify-center'>
-                            <p className='flex flex-col justify-center text-white'>Les in fil</p>
-
-                        </button>
+                        <>
+                            <button onClick={() => modifyModal('filModal')} className='hover:bg-green-600 h-full w-32 items-center justify-center'>
+                                <p className='flex flex-col justify-center text-white'>Les in fil</p>
+                            </button>
+                            <button onClick={() => destroy()} className='hover:bg-green-600 h-full w-32 items-center justify-center'>
+                                <p className='flex flex-col justify-center text-white'>Logg ut</p>
+                            </button>
+                        </>
                         :
-                        <></>
+
+                        <button onClick={() => modifyModal('login')} className='hover:bg-green-600 h-full w-32 items-center justify-center'>
+                            <p className='flex flex-col justify-center text-white'>Innlogging</p>
+                        </button>
                     }
-                    <button onClick={() => openLogin()} className='hover:bg-green-600 h-full w-32 items-center justify-center'>
-                        <p className='flex flex-col justify-center text-white'>Innlogging</p>
-                    </button>
+
+
                 </div>
             </header>
         </>
 
     )
     function loginModal() {
-       return (
+        return (
             <>
                 <div className='absolute flex items-center justify-center w-full h-full'>
                     <div className='flex justify-center items-center z-20 absolute w-1/3 bg-white rounded-lg opacity-100 flex-col'>
@@ -74,7 +124,7 @@ export default function Header({ admin = false, VerifyLoginn }) {
                             </div>
                         </div>
                         <div className='w-1/2 bottom-0 m-10 flex justify-between'>
-                            <button className='rounded-lg w-24 h-12 bg-green-900 hover:bg-green-600 text-white' onClick={() => setModal(undefined)}>Lukk</button>
+                            <button className='rounded-lg w-24 h-12 bg-green-900 hover:bg-green-600 text-white' onClick={() => modifyModal('close')}>Lukk</button>
                             <button className='rounded-lg w-24 h-12 bg-green-900 hover:bg-green-600 text-white' onClick={() => Loginn()}>Logg inn</button>
                         </div>
                     </div>
@@ -84,17 +134,21 @@ export default function Header({ admin = false, VerifyLoginn }) {
             </>)
     }
     function filModal() {
-          return (
+        return (
             <>
                 <div className='absolute flex items-center justify-center w-full h-full'>
                     <div className='flex justify-center items-center z-20 absolute w-1/3 bg-white rounded-lg opacity-100 flex-col'>
                         <h1 className='m-10 text-2xl'>Les inn fil</h1>
-                        <input accept='.json' type='file' className='flex flex-col justify-center text-white' />
+                        <input onChange={(e) => setFile(e.target.files[0])} accept='.json' type='file' className='p-2 rounded-lg bg-green-900 hover:bg-green-600 text-white' />
+                        <div className='w-1/2  bottom-0 m-10 flex justify-between'>
+                            <button className='rounded-lg w-24 h-12 bg-green-900 hover:bg-green-600 text-white' onClick={() => modifyModal('close')}>Lukk</button>
+                            <button className='rounded-lg w-24 h-12 bg-green-900 hover:bg-green-600 text-white' onClick={() => uploadFile()}>Les inn</button>
+                        </div>
                     </div>
                 </div>
                 <span className='z-10 items-center absolute w-full h-full bg-gray-600 opacity-50'>
                 </span>
             </>)
-       
+
     }
 }

@@ -1,6 +1,7 @@
 [
     {
         "quizName": "programering",
+        "description": "quiz om programmering",
         "categories": [
             {
                 "categoryName": "syntax",
@@ -9,11 +10,11 @@
                         "question": "Hvordan definerer du en variabel som ikke kan endres?",
                         "answers": [
                             {
-                                "answer": "const",
+                                "text": "const",
                                 "correct": true
                             },
                             {
-                                "answer": "let",
+                                "text": "let",
                                 "correct": false
                             }
                         ]
@@ -22,11 +23,11 @@
                         "question": "Hva er ikke en array funksjon",
                         "answers": [
                             {
-                                "answer": "Array.some()",
+                                "text": "Array.some()",
                                 "correct": false
                             },
                             {
-                                "answer": "Array.all()",
+                                "text": "Array.all()",
                                 "correct": true
                             }
                         ]
@@ -40,11 +41,11 @@
                         "question": "Hvilket er ikke et variant av javascript?",
                         "answers": [
                             {
-                                "answer": "python",
+                                "text": "python",
                                 "correct": true
                             },
                             {
-                                "answer": "JSFuck",
+                                "text": "JSFuck",
                                 "correct": false
                             }
                         ]
@@ -53,11 +54,11 @@
                         "question": "Hvor mange tegn trengs for å skrive JSFuck?",
                         "answers": [
                             {
-                                "answer": "6 karakterer",
+                                "text": "6 karakterer",
                                 "correct": true
                             },
                             {
-                                "answer": "Hele alfabetet",
+                                "text": "Hele alfabetet",
                                 "correct": false
                             }
                         ]
