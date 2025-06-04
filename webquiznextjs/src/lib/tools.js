@@ -75,18 +75,13 @@ export async function VerifyLoginn(username, password) {
 export async function ConstructQuizLoop(quizid) {
     let quizStructure = [];
     let categories = await SQL.GetCategories(quizid)
-    console.log('tstnig:', categories)
     try {
         if (!Array.isArray(categories) && categories !== undefined && categories !== null)
             categories = [categories];
-        for (const category in categories) {
-            console.log('categories: ', category)
+        for (const category of categories) {
 
-            quizStructure.push({ category: category.categoryName, questions: await ConstructCategoryQuestion(category) })
-            console.log('quisStruc: ', quizStructure)
+            quizStructure.push({ category: category.categoryName, id:category.idCategories, questions: await ConstructCategoryQuestion(category) })
         }
-        // return categories.map(category => await ())
-
         return quizStructure
     } catch (error) {
         return error
@@ -99,18 +94,13 @@ export async function ConstructQuizLoop(quizid) {
  */
 async function ConstructCategoryQuestion(category) {
     let categoryStructure = [];
-    // console.log('qLooped: ', category)
     let questions = await SQL.GetQuestions(category.idCategories);
     if (!Array.isArray(questions) && questions !== undefined && questions !== null)
         questions = [questions];
-    for (const question in questions) {
-        // console.log('question: ', question)
-        categoryStructure.push({ question: question.question, options: await ContrustQuestionOptions(question) })
-        // console.log('cateStruc: ', categoryStructure)
-
+    for (const question of questions) {
+        categoryStructure.push({ question: question.question, id: question.idQuestion, options: await ContrustQuestionOptions(question) })
     }
     return categoryStructure;
-    // return question.map(question => await({ question: question.question, options: ContrustQuestionOptions(question) }))
 }
 /**
  * 
@@ -119,17 +109,13 @@ async function ConstructCategoryQuestion(category) {
  */
 async function ContrustQuestionOptions(question) {
     let questionStructure = [];
-    // console.log('oLooped: ', question)
     let options = await SQL.GetOptions(question.idQuestion)
     if (!Array.isArray(options) && options !== undefined && options !== null)
         options = [options];
-    for (const option in options) {
-        questionStructure.push({ text: option.optionText, correct: option.correct });
-        // console.log('questStruc: ', questionStructure)
-
+    for (const option of options) {
+        questionStructure.push({ text: option.optionText, id:option.idQuestionOption, correct: option.correct });
     }
     return questionStructure;
-    // return options.map((option) => await({ text: option.optionText, correct: option.correct }))
 }
 
 
