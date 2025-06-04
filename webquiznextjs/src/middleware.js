@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 //blir kjørt mellom hver request, kaster ut brukere som ikke har admin data i session når de prøver å gå til /admin
 export async function middleware(request) {
-    const needsSession = ["/admin"]
+    const needsSession = ["/admin", "/quiz"]
     if (needsSession.some(url => request.nextUrl.pathname.startsWith(url))) {
         const session = await getIronSession(request.cookies, {
             password: process.env.SESSION_PWD,
@@ -16,6 +16,12 @@ export async function middleware(request) {
                 return NextResponse.redirect(new URL('/', request.url));
             }
 
+        }
+        if(!session.currQuizID){
+             if (request.nextUrl.pathname.startsWith("/quiz")) {
+                session.destroy()
+                return NextResponse.redirect(new URL('/', request.url));
+            }
         }
         //utvider session
         const response = NextResponse.next();

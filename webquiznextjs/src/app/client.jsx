@@ -29,7 +29,7 @@ export default function ClientIndex({ GetQuizez, StartQuiz }) {
         </div>
         <div key={`${quiz.idQuiz}-lowerContent`} className='flex h-1/2 flex-col justify-end p-2.5'>
           <div className='flex flex-row gap-2.5'>
-            <button onClick={() => { RouteToQUiz(quiz.idQuiz, teamName) }} key={`${quiz.idQuiz}-startButton`} className='bg-green-900 hover:bg-green-600 border-white border-2 rounded-b-lg h-8 w-32 items-center justify-center'>
+            <button onClick={() => { RouteToQUiz(quiz.idQuiz) }} key={`${quiz.idQuiz}-startButton`} className='bg-green-900 hover:bg-green-600 border-white border-2 rounded-b-lg h-8 w-32 items-center justify-center'>
               <p key={`${quiz.idQuiz}-btnText`} className='flex flex-col justify-center text-white'>Start</p>
             </button>
             {/* <div className='w-4/5 lg:w-3/5  xl:w-2/5'>

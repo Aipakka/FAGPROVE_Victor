@@ -67,23 +67,72 @@ export async function VerifyLoginn(username, password) {
         ]
     }
 ]
+/**
+ * 
+ * @param {*} quizid id for the quiz to be constructed 
+ * @returns categories and all children needed to render quiz for user
+ */
 export async function ConstructQuizLoop(quizid) {
-    const quizStructure = [];
-    const categories = SQL.GetCategories(quizid)
+    let quizStructure = [];
+    let categories = await SQL.GetCategories(quizid)
     console.log('tstnig:', categories)
-    // try {
-    //     if (!Array.isArray(categories) && categories !== undefined && categories !== null)
-    //         categories = [categories];
-    //     categories.forEach(async category => {
-    //         const question = await SQL.GetQuestions(category.idCategory)
-    //           if (!Array.isArray(categories) && categories !== undefined && categories !== null)
-    //         categories = [categories];
-    //     })
-    //     return 'constructQuizSuccess'
-    // } catch (error) {
-    //     return error
-    // }
+    try {
+        if (!Array.isArray(categories) && categories !== undefined && categories !== null)
+            categories = [categories];
+        for (const category in categories) {
+            console.log('categories: ', category)
+
+            quizStructure.push({ category: category.categoryName, questions: await ConstructCategoryQuestion(category) })
+            console.log('quisStruc: ', quizStructure)
+        }
+        // return categories.map(category => await ())
+
+        return quizStructure
+    } catch (error) {
+        return error
+    }
 }
+/**
+ * 
+ * @param {*} category category to gather questions from
+ * @returns questions to the related category
+ */
+async function ConstructCategoryQuestion(category) {
+    let categoryStructure = [];
+    // console.log('qLooped: ', category)
+    let questions = await SQL.GetQuestions(category.idCategories);
+    if (!Array.isArray(questions) && questions !== undefined && questions !== null)
+        questions = [questions];
+    for (const question in questions) {
+        // console.log('question: ', question)
+        categoryStructure.push({ question: question.question, options: await ContrustQuestionOptions(question) })
+        // console.log('cateStruc: ', categoryStructure)
+
+    }
+    return categoryStructure;
+    // return question.map(question => await({ question: question.question, options: ContrustQuestionOptions(question) }))
+}
+/**
+ * 
+ * @param {*} question question to gather the options to
+ * @returns  options to the related question
+ */
+async function ContrustQuestionOptions(question) {
+    let questionStructure = [];
+    // console.log('oLooped: ', question)
+    let options = await SQL.GetOptions(question.idQuestion)
+    if (!Array.isArray(options) && options !== undefined && options !== null)
+        options = [options];
+    for (const option in options) {
+        questionStructure.push({ text: option.optionText, correct: option.correct });
+        // console.log('questStruc: ', questionStructure)
+
+    }
+    return questionStructure;
+    // return options.map((option) => await({ text: option.optionText, correct: option.correct }))
+}
+
+
 export async function InsertQuizLoop(quizList) {
     try {
         if (!Array.isArray(quizList) && quizList !== undefined && quizList !== null)

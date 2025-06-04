@@ -9,7 +9,8 @@ async function GetQuizez() {
   const res = SQL.GetQuizes()
   return res
 }
-async function StartQuiz(quizID, teamname) {
+
+async function StartQuiz(quizID) {
   "use server"
   const userCookies = await cookies();
   const session = await getIronSession(userCookies, {

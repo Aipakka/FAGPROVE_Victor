@@ -83,7 +83,7 @@ export default class SQL {
             const result = await sql.query(`SELECT "categoryName", "idCategories" FROM "categories" WHERE "parentQuizID" = $1 ORDER BY RANDOM()`, [Number(parentID)]);
             return result
         } catch (error) {
-            console.log('SQL error: ', error);
+            // console.log('SQL error: ', error);
             return 'error'
         }
     }
@@ -99,7 +99,7 @@ export default class SQL {
             const result = await sql.query(`SELECT "question", "idQuestion" FROM "questions" WHERE "parentCategoryID" = $1 ORDER BY RANDOM()`, [Number(parentID)]);
             return result
         } catch (error) {
-            console.log('SQL error: ', error);
+            // console.log('SQL error: ', error);
             return 'error'
         }
     }
@@ -115,7 +115,7 @@ export default class SQL {
             const result = await sql.query(`SELECT "optionText", "idQuestionOption", "correctAnswer" FROM "questionOptions" WHERE "parentQuestionID" = $1 ORDER BY RANDOM()`, [Number(parentID)]);
             return result
         } catch (error) {
-            console.log('SQL error: ', error);
+            // console.log('SQL error: ', error);
             return 'error'
         }
     }
