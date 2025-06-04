@@ -22,7 +22,6 @@ async function StartQuiz(quizID, teamname) {
 
   //session verdier, session."variabelNavn" blir opprettet av session om det ikke eksisterer
   session.currQuizID = quizID;
-  session.team = teamname;
   await session.save()
   return 'success'
 
