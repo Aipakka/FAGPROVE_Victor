@@ -67,7 +67,23 @@ export async function VerifyLoginn(username, password) {
         ]
     }
 ]
-
+export async function ConstructQuizLoop(quizid) {
+    const quizStructure = [];
+    const categories = SQL.GetCategories(quizid)
+    console.log('tstnig:', categories)
+    // try {
+    //     if (!Array.isArray(categories) && categories !== undefined && categories !== null)
+    //         categories = [categories];
+    //     categories.forEach(async category => {
+    //         const question = await SQL.GetQuestions(category.idCategory)
+    //           if (!Array.isArray(categories) && categories !== undefined && categories !== null)
+    //         categories = [categories];
+    //     })
+    //     return 'constructQuizSuccess'
+    // } catch (error) {
+    //     return error
+    // }
+}
 export async function InsertQuizLoop(quizList) {
     try {
         if (!Array.isArray(quizList) && quizList !== undefined && quizList !== null)

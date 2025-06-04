@@ -71,10 +71,65 @@ export default class SQL {
             return 'error'
         }
     }
+    //SQL SELECT quiz categories
+    /**
+     * 
+     * @param {*} parentID integer - id of parent quiz in DB
+     * @returns result from categories SQL table from parameters
+     */
+    static async GetCategories(parentID) {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            const result = await sql.query(`SELECT "categoryName", "idCategories" FROM "categories" WHERE "parentQuizID" = $1 ORDER BY RANDOM()`, [Number(parentID)]);
+            return result
+        } catch (error) {
+            console.log('SQL error: ', error);
+            return 'error'
+        }
+    }
+    //SQL SELECT category questions
+    /**
+     * 
+     * @param {*} parentID integer - id of parent category in DB
+     * @returns result from questions SQL table from parameters
+     */
+    static async GetQuestions(parentID) {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            const result = await sql.query(`SELECT "question", "idQuestion" FROM "questions" WHERE "parentCategoryID" = $1 ORDER BY RANDOM()`, [Number(parentID)]);
+            return result
+        } catch (error) {
+            console.log('SQL error: ', error);
+            return 'error'
+        }
+    }
+    //SQL SELECT question options
+    /**
+     * 
+     * @param {*} parentID integer - id of parent question in DB
+     * @returns result from questionOptions SQL table from parameters
+     */
+    static async GetOptions(parentID) {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            const result = await sql.query(`SELECT "optionText", "idQuestionOption", "correctAnswer" FROM "questionOptions" WHERE "parentQuestionID" = $1 ORDER BY RANDOM()`, [Number(parentID)]);
+            return result
+        } catch (error) {
+            console.log('SQL error: ', error);
+            return 'error'
+        }
+    }
     //SQL INSERT for en en quiz
+    /**
+     * 
+     * @param {*} quizName string, quiz name
+     * @param {*} description string, quiz description
+     * @param {*} idUser integer, id of user importing quiz
+     * @returns 
+     */
     static async InsertQuiz(quizName, description, idUser) {
         try {
-            console.log('InsertQuiz: ',quizName, description, idUser)
+            console.log('InsertQuiz: ', quizName, description, idUser)
             const sql = neon(process.env.DATABASE_URL);
             await sql.query(`INSERT INTO "quiz" ("quizName", "description", "createdByUser") values ($1, $2, $3)`, [String(quizName), String(description), Number(idUser)]);
             const result = await sql.query(`SELECT "idQuiz" FROM "quiz" WHERE "quizName" = $1 AND "description" = $2`, [String(quizName), String(description)])

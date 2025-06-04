@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 
-export default function Header({readFileToDB,  adminName, admin = false, VerifyLoginn, destroySession }) {
+export default function Header({ readFileToDB, inQuiz, adminName, admin = false, VerifyLoginn, destroySession }) {
     const [modal, setModal] = useState('')
     const [passord, setPassord] = useState('')
     const [username, setUsername] = useState('')
@@ -15,13 +15,11 @@ export default function Header({readFileToDB,  adminName, admin = false, VerifyL
         return new Promise((resolve, reject) => {
             const reader = new FileReader;
             reader.onload = (evt) => {
-                console.log('res bf: ', evt.target.result);
                 resolve(fileRead.current = JSON.parse(evt.target.result));
-
             };
             reader.readAsText(file)
         });
-             
+
     }
     async function ReadFile(file) {
         await asyncFileReader(file);
@@ -51,11 +49,8 @@ export default function Header({readFileToDB,  adminName, admin = false, VerifyL
         router.replace('/');
     }
     async function Loginn() {
-        console.log('client:', username)
         const res = await VerifyLoginn(username, passord)
-        console.log('servres:', res)
         if (res == 'loginnSuccess') {
-            console.log('inside if')
             setModal(false)
             router.push('/admin');
         } else {
@@ -65,12 +60,12 @@ export default function Header({readFileToDB,  adminName, admin = false, VerifyL
 
     }
     async function uploadFile() {
-       const res = await readFileToDB(fileRead.current);
-       if (res === 'fileReadToDBsuccess'){
-        fileRead.current = [];
-        setFile(undefined);
-        setModal(false);
-       }
+        const res = await readFileToDB(fileRead.current);
+        if (res === 'fileReadToDBsuccess') {
+            fileRead.current = [];
+            setFile(undefined);
+            setModal(false);
+        }
     }
 
     return (
@@ -95,11 +90,15 @@ export default function Header({readFileToDB,  adminName, admin = false, VerifyL
                                 <p className='flex flex-col justify-center text-white'>Logg ut</p>
                             </button>
                         </>
-                        :
+                        : inQuiz ?
+                            <button onClick={() => destroy()} className='hover:bg-green-600 h-full w-32 items-center justify-center'>
+                                <p className='flex flex-col justify-center text-white'>Stopp quiz</p>
+                            </button>
+                            :
 
-                        <button onClick={() => modifyModal('login')} className='hover:bg-green-600 h-full w-32 items-center justify-center'>
-                            <p className='flex flex-col justify-center text-white'>Innlogging</p>
-                        </button>
+                            <button onClick={() => modifyModal('login')} className='hover:bg-green-600 h-full w-32 items-center justify-center'>
+                                <p className='flex flex-col justify-center text-white'>Innlogging</p>
+                            </button>
                     }
 
 
