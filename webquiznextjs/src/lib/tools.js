@@ -96,6 +96,7 @@ export async function InsertQuizLoop(quizList) {
 
 
 }
+//legger til alle quizer fra fil i databasen
 async function QuizezInList(quizList) {
     try {
         const userCookies = await cookies();
@@ -117,6 +118,7 @@ async function QuizezInList(quizList) {
         return (error)
     }
 }
+//legger inn alle kategorier til en quiz i databasen
 async function CategoriesInQuiz(quiz, quizID) {
     try {
 
@@ -130,6 +132,7 @@ async function CategoriesInQuiz(quiz, quizID) {
         return (error)
     }
 }
+//legger inn alle spørsmål til en kategori i databasen
 async function QuestionsInCategory(category, categoryID) {
     try {
         await category.questions.forEach(async question => {
@@ -143,6 +146,8 @@ async function QuestionsInCategory(category, categoryID) {
     }
 
 }
+
+//legger inn all svar til et spørsmål i databasen
 async function AnswersToQuestion(question, questionID) {
     try {
         await question.answers.forEach(async answer => {

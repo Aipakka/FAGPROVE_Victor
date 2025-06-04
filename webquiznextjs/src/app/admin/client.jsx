@@ -7,11 +7,10 @@ export default function AdminClient({ getQuizez }) {
       const [shownQuizez, setshownQuizez] = useState([])
     async function getServerQuizez() {
         const res = await getQuizez();
-
         console.log('serv quiz: ', res)
         allQuizez.current = res;
         setshownQuizez(allQuizez.current.map(quiz =>
-            <div key={`${quiz.idQuiz}-topDiv`} className='bg-green-700 rounded-lg text-white flex flex-col w-[50dvw] h-[30dvh] p-2.5' >
+            <div key={`${quiz.idQuiz}-topDiv`} className='bg-green-700 rounded-lg text-white flex flex-col w-[50vw] h-[30vh] p-2.5' >
                 <div key={`${quiz.idQuiz}-upperContent`} className='flex flex-col h-1/2 p-2.5 gap-2.5'>
                     <h1 key={`${quiz.idQuiz}-name`} className='text-3xl'>{quiz.quizName} </h1>
                     

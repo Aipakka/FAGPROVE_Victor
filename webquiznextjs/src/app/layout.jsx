@@ -46,9 +46,9 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en" >
 
-      <body style={{ marginTop: '72px' }}>
+      <body className='' style={{ marginTop: '72px' }}>
         <Header adminName={admName[0]?.username} admin={session.admin} inQuiz={session.quizid ? true : false} VerifyLoginn={ServerWrapperLoginn} destroySession={ServerWrapperdestroySession} readFileToDB={ServerWrapperInsertQuizLoop} />
-        <main className={`flex flex-col w-[100dvw] h-[100dvh] items-center `}>
+        <main className={`flex flex-col  items-center `}>
           {children}
         </main>
       </body>

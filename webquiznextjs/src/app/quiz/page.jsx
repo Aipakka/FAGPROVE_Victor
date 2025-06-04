@@ -13,9 +13,9 @@ export default async function DynamicQuizServer({ params }) {
         }
     });
     console.log('sess ',  session)
-    console.log('sess log',  session.quizid)
+    console.log('sess log',  session.currQuizID)
     if (session.quizid) {
-        const quizStructure = await ConstructQuizLoop( session.quizid)
+        const quizStructure = await ConstructQuizLoop( session.currQuizID)
     }
     return (<DynamicQuizClient />)
 }
