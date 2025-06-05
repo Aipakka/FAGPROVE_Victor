@@ -5,6 +5,19 @@ import { getIronSession } from 'iron-session';
 import SQL from '@/lib/sql';
 
 export default async function DynamicQuizServer({ params }) {
+    async function ServerWrapperdestroySession() {
+        "use server"
+        const userCookies = await cookies();
+        const session = await getIronSession(userCookies, {
+            password: process.env.SESSION_PWD,
+            cookieName: 'session',
+            cookieOptions: {
+                maxAge: 60 * 30
+            }
+        })
+        session.destroy()
+    }
+
     async function ServerFinishQuiz(answers) {
         "use server"
         console.log('ansrs: ', answers)
@@ -17,6 +30,7 @@ export default async function DynamicQuizServer({ params }) {
     }
     async function SetTeamName(teamname) {
         "use server"
+
         const userCookies = await cookies();
         const session = await getIronSession(userCookies, {
             password: process.env.SESSION_PWD,
@@ -25,11 +39,16 @@ export default async function DynamicQuizServer({ params }) {
                 maxAge: 60 * 30
             }
         });
-
+        const res = await SQL.CheckCompletion(teamname, session.currQuizID);
+        if (res === 'noTeam'){
         //session verdier, session."variabelNavn" blir opprettet av session om det ikke eksisterer
         session.teamname = teamname;
         await session.save()
         return 'success'
+        } else{
+            return('Team har allered svart')
+        }
+
     }
 
     const userCookies = await cookies();
@@ -46,5 +65,5 @@ export default async function DynamicQuizServer({ params }) {
         if (!Array.isArray(quizStructure) && quizStructure !== undefined && quizStructure !== null)
             quizStructure = [quizStructure];
     }
-    return (<DynamicQuizClient FinishQuiz={ServerFinishQuiz} quizID={session.currQuizID} SetTeamName={SetTeamName} quizData={quizStructure} />)
+    return (<DynamicQuizClient destroySession={ServerWrapperdestroySession} FinishQuiz={ServerFinishQuiz} quizID={session.currQuizID} SetTeamName={SetTeamName} quizData={quizStructure} />)
 }

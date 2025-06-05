@@ -205,18 +205,15 @@ export default class SQL {
     static async InsertTeam(teamName, idQuiz) {
         try {
             const sql = neon(process.env.DATABASE_URL);
-            console.log('it1: ', teamName, idQuiz)
-            const checkForTeam = await sql.query(`SELECT "idTeam" FROM "teams" WHERE "name" = $1 AND "quizTakenID" = $2`, [String(team), Number(idQuiz)])
-            console.log('it2: ', checkForTeam)
-            if (checkForTeam[0].idTeam)
+            const checkForTeam = await sql.query(`SELECT "idTeam" FROM "teams" WHERE "name" = $1 AND "quizTakenID" = $2`, [String(teamName), Number(idQuiz)])
+            if (checkForTeam[0]?.idTeam)
                 return checkForTeam[0].idTeam
-            await sql.query(`INSERT INTO "teams" ("name", "quizTakenID") values ($1, $2)`, [String(team), Number(idQuiz)]);
-            const result = await sql.query(`SELECT "idTeam" FROM "teams" WHERE "name" = $1 AND "quizTakenID" = $2`, [String(team), Number(idQuiz)])
-            console.log('it3: ', checkForTeam)
+            await sql.query(`INSERT INTO "teams" ("name", "quizTakenID") values ($1, $2)`, [String(teamName), Number(idQuiz)]);
+            const result = await sql.query(`SELECT "idTeam" FROM "teams" WHERE "name" = $1 AND "quizTakenID" = $2`, [String(teamName), Number(idQuiz)])
             return result[0].idTeam
 
         } catch (error) {
-            // console.log('SQL error: ', error);
+            console.log('SQL error: ', error);
             return 'error'
         }
     }
@@ -233,16 +230,31 @@ export default class SQL {
      */
     static async InsertAnswer(team, idQuiz, idCategory, idQuestion, idQuestionOption, optionCorrect) {
         try {
-            console.log('ia1: ', team, idQuiz, idCategory, idQuestion, idQuestionOption, optionCorrect)
             const sql = neon(process.env.DATABASE_URL);
             const teamID = await this.InsertTeam(team, idQuiz);
-            console.log('ia2: ', teamID)
-            const result = await sql.query(`INSERT INTO "answers" ("teamID", "parentQuestionID", "categoryID", "questionID", "questionOptionID", "correctAnswer") values ($1, $2, $3, $4, $5, $6)`, [Number(teamID), Number(idQuiz), Number(idCategory), Number(idQuestion), Number(idQuestionOption), Boolean(optionCorrect)]);
-            console.log('ia3: ',result)
+            const result = await sql.query(`INSERT INTO "answers" ("teamID", "quizID", "categoryID", "questionID", "questionOptionID", "correctAnswer") values ($1, $2, $3, $4, $5, $6)`, [Number(teamID), Number(idQuiz), Number(idCategory), Number(idQuestion), Number(idQuestionOption), Boolean(optionCorrect)]);
             return result
         } catch (error) {
-            // console.log('SQL error: ', error);
+            console.log('SQL error: ', error);
             return 'error'
+        }
+    }
+
+    //SQL SELECT checks if user team has answered quiz already
+    static async CheckCompletion(teamName, idQuiz) {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            const checkForTeam = await sql.query(`SELECT "idTeam" FROM "teams" WHERE "name" = $1 AND "quizTakenID" = $2`, [String(teamName), Number(idQuiz)])
+            console.log('teamCheck: ', checkForTeam)
+            let answerCheckRes = undefined;
+            if (checkForTeam[0]?.idTeam) {
+                answerCheckRes = await sql.query(`SELECT * FROM "answers" WHERE "quizID" = $1 AND "teamID" = $2`, [ Number(idQuiz), Number(checkForTeam[0].idTeam)])
+                return answerCheckRes
+            }
+            else return 'noTeam'
+
+        } catch (error) {
+
         }
     }
 }

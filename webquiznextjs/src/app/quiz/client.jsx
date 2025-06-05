@@ -1,11 +1,13 @@
 "use client"
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation';
 
-export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, quizData }) {
+export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, quizData, destroySession }) {
     const [teamName, setTeamName] = useState('')
     const [categoryStartIndex, setCategoryStartIndex] = useState(0);
     const [questionStartIndex, setQuestionStartIndex] = useState(0);
-
+    const [finished, setFinished] = useState(false)
+    const router = useRouter();
     const [userAnswer, setUserAnswer] = useState({ id: undefined, correct: undefined })
     const fullQuiz = quizData;
     const answers = useRef([]);
@@ -27,25 +29,41 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
             answers.current.push(answer)
             setCategoryStartIndex(categoryStartIndex + 1)
             setQuestionStartIndex(0)
-        } else if(!fullQuiz[categoryStartIndex].questions[questionStartIndex + 1] && !fullQuiz[categoryStartIndex + 1]){
+        } else if (!fullQuiz[categoryStartIndex].questions[questionStartIndex + 1] && !fullQuiz[categoryStartIndex + 1]) {
             answers.current.push(answer)
             console.log('client answer rb send serv: ', answers.current)
             await FinishQuiz(answers.current)
-            alert('done')
+            setFinished(true);
         }
-         console.log('client answer end func useref: ', answers.current)
+        console.log('client answer end func useref: ', answers.current)
     }
     useEffect(() => { console.log('usrans: ', userAnswer) }, [userAnswer])
     const savedTeamName = useRef(undefined);
     async function SaveTeamname() {
         if (teamName != '') {
-            await SetTeamName(teamName)
-            savedTeamName.current = teamName;
+            let res = await SetTeamName(teamName)
+            if (res === 'success')
+                savedTeamName.current = teamName;
+            else alert(res)
         }
 
     }
+    async function destroy() {
+        await destroySession();
+        router.replace('/');
+    }
     return (
-        savedTeamName.current ?
+        savedTeamName.current ? finished ?
+            <div className='flex justify-center items-center  [40vw] bg-green-700 rounded-lg opacity-100 text-white flex-col'>
+                <h1 className='m-10 text-2xl'>GRATULERER!!!!</h1>
+                <h2 className='m-10 text-lg text-center'> Du får deltager premie i form av ASCII art av en orm.<br /> Vinner er konfidensielt avholdt til Admin.<br />
+                    ____/¨
+                </h2>
+                <div className='w-1/2 bottom-0 m-10 flex justify-center'>
+                    <button className=' rounded-lg  text-nowrap p-2.5  bg-green-900 hover:bg-green-600 text-white' onClick={() => { destroy() }}>Gå hjem</button>
+                </div>
+            </div>
+            :
             <>
                 <div key={`${fullQuiz[categoryStartIndex].id}-topDiv`} className='bg-green-700 rounded-lg  flex flex-col w-[40vw] h-fit p-12' >
                     <div key={`${fullQuiz[categoryStartIndex].id}-upperContent`} className='flex flex-col h-1/3 p-2.5 gap-2.5'>
@@ -69,11 +87,7 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
                             <button onClick={() => { CycleQuestion({ team: savedTeamName.current, idQuiz: quizID, idCategory: fullQuiz[categoryStartIndex].id, idQuestion: fullQuiz[categoryStartIndex].questions[questionStartIndex].id, idQuestionOption: userAnswer.id, optionCorrect: userAnswer.correct }) }} key={`${fullQuiz[categoryStartIndex].id}-startButton`} className='bg-green-900 hover:bg-green-600 border-white px-1.5 border-2 rounded-b-lg h-8 w-fit items-center justify-center'>
                                 <p key={`${fullQuiz[categoryStartIndex].id}-btnText`} className='flex flex-col justify-center text-white'>Neste spørsmål</p>
                             </button>
-                            <button onClick={() => { alert(JSON.stringify(fullQuiz)) }} key={`${fullQuiz[categoryStartIndex].id}8321-startButton`} className='bg-green-900 hover:bg-green-600 border-white px-1.5 border-2 rounded-b-lg h-8 w-fit items-center justify-center'>
-                                <p key={`${fullQuiz[categoryStartIndex].id}-btnText`} className='flex flex-col justify-center text-white'>test</p>
-                            </button>
-                            <p>categorystartIndex: {categoryStartIndex}</p>
-                            <p>questionStartIndex: {questionStartIndex}</p>
+
 
                         </div>
                     </div>
@@ -82,7 +96,7 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
             :
             <>
                 <div className='flex justify-center items-center  w-1/5 bg-green-700 rounded-lg opacity-100 text-white flex-col'>
-                    <h1 className='m-10 text-2xl'>Innlogging</h1>
+                    <h1 className='m-10 text-2xl'>Velg Lagnavn</h1>
                     <div className='w-4/5 lg:w-3/5  xl:w-2/5'> Lagnavn<br />
                         <input type={'text'} value={teamName} onChange={(e) => setTeamName(e.target.value)} className='p-1 text-gray-600 rounded-lg bg-amber-50 outline-gray-800 outline w-full ' placeholder={'Lagnavn'} />
                     </div>
