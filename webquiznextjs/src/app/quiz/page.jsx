@@ -2,8 +2,16 @@ import DynamicQuizClient from './client';
 import { ConstructQuizLoop } from '@/lib/tools';
 import { cookies } from 'next/headers';
 import { getIronSession } from 'iron-session';
+import SQL from '@/lib/sql';
 
 export default async function DynamicQuizServer({ params }) {
+    async function ServerFinishQuiz(answers){
+        "use server"
+    for (const answer of answers){
+            await SQL.InsertAnswer(answer.team, answer.idQuiz, answer.idCategory, answer.idQuestion, answer.idQuestionOption, answer.optionCorrect ) 
+            
+        };
+    }
     async function SetTeamName(teamname) {
         "use server"
         const userCookies = await cookies();
@@ -35,5 +43,5 @@ export default async function DynamicQuizServer({ params }) {
         if (!Array.isArray(quizStructure) && quizStructure !== undefined && quizStructure !== null)
             quizStructure = [quizStructure];
     }
-    return (<DynamicQuizClient quizID={session.currQuizID} SetTeamName={SetTeamName} quizData={quizStructure} />)
+    return (<DynamicQuizClient FinishQuiz={ServerFinishQuiz} quizID={session.currQuizID} SetTeamName={SetTeamName} quizData={quizStructure} />)
 }

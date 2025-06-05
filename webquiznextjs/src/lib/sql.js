@@ -174,4 +174,27 @@ export default class SQL {
             return 'error'
         }
     }
+    static async InsertTeam(teamName, idQuiz) {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            await sql.query(`INSERT INTO "teams" ("name", "quizTakenID") values ($1, $2)`, [String(team), Number(idQuiz)]);
+            const result = await sql.query(`SELECT "idTeam" FROM "teams" WHERE "name" = $1 AND "quizTakenID" = $2`, [String(team), Number(idQuiz)])
+            return result[0].idTeam
+        } catch (error) {
+            // console.log('SQL error: ', error);
+            return 'error'
+        }
+    }
+    //SQL INSERT for svar fra teamNavn til spesifisert, quiz, kategori & spørsmål
+    static async InsertOption(team, idQuiz, idCategory, idQuestion, idQuestionOption, optionCorrect) {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            const teamID = await this.InsertTeam(team, idQuiz);
+            const result = await sql.query(`INSERT INTO "answers" ("teamID", "parentQuestionID", "correctAnswer") values ($1, $2, $3, $4, $5, $6)`, [Number(teamID), Number(idQuiz), Number(idCategory), Number(idQuestion), Number(idQuestionOption), Boolean(optionCorrect)]);
+            return result
+        } catch (error) {
+            // console.log('SQL error: ', error);
+            return 'error'
+        }
+    }
 }

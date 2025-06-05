@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from 'react'
 
-export default function DynamicQuizClient({ quizID, SetTeamName, quizData }) {
+export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, quizData }) {
     const [teamName, setTeamName] = useState('')
     const [categoryStartIndex, setCategoryStartIndex] = useState(0);
     const [questionStartIndex, setQuestionStartIndex] = useState(0);
@@ -11,7 +11,11 @@ export default function DynamicQuizClient({ quizID, SetTeamName, quizData }) {
     const currentCategory = useRef(fullQuiz[categoryStartIndex])
     const currentQuestion = useRef(fullQuiz[categoryStartIndex].questions[questionStartIndex])
     const answers = useRef([]);
-    function CycleQuestion(answer) {
+
+    //sjekker om brukeren har avgitt svaret sitt
+    //Sjekker om det er et neste spørsmål i kategorien eller om den må gå til neste kategori og begynne på spørsmålene der.
+    //lagrer svar fra Bruker som blir sendt til funksjonen som parameter i variabel answers
+    async function CycleQuestion(answer) {
         if (userAnswer.id === undefined || userAnswer.correct === undefined) {
             alert('Du må velge et svar-alternativ')
             return
@@ -28,6 +32,7 @@ export default function DynamicQuizClient({ quizID, SetTeamName, quizData }) {
             currentCategory.current = fullQuiz[categoryStartIndex]
             currentQuestion.current = fullQuiz[categoryStartIndex].questions[questionStartIndex].question;
         } else {
+            await FinishQuiz(answers.current)
             alert('done')
         }
     }
@@ -69,17 +74,6 @@ export default function DynamicQuizClient({ quizID, SetTeamName, quizData }) {
 
                         </div>
                     </div>
-                </div>
-                <div className='flex flex-row gap-8'>
-                    {answers.current.length >= 1 && answers.current.map(answer => (
-                        <div id={answer.key}>
-                            <div id={answer.idQuiz}>{answer.idQuiz}</div>
-                            <div id={answer.idCategory}>{answer.idCategory}</div>
-                            <div id={answer.iidQuestionQuiz}>{answer.idQuestion}</div>
-                            <div id={answer.idQuestionOptionQuiz}>{answer.idQuestionOption}</div>
-                            <div id={String(answer.optionCorrect)}>{String(answer.optionCorrect)}</div>
-                        </div>
-                    ))}
                 </div>
             </>
             :
