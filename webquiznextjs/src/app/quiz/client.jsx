@@ -8,14 +8,13 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
 
     const [userAnswer, setUserAnswer] = useState({ id: undefined, correct: undefined })
     const fullQuiz = quizData;
-    const currentCategory = useRef(fullQuiz[categoryStartIndex])
-    const currentQuestion = useRef(fullQuiz[categoryStartIndex].questions[questionStartIndex])
     const answers = useRef([]);
 
     //sjekker om brukeren har avgitt svaret sitt
     //Sjekker om det er et neste spørsmål i kategorien eller om den må gå til neste kategori og begynne på spørsmålene der.
     //lagrer svar fra Bruker som blir sendt til funksjonen som parameter i variabel answers
     async function CycleQuestion(answer) {
+        console.log('client answer: ', answer)
         if (userAnswer.id === undefined || userAnswer.correct === undefined) {
             alert('Du må velge et svar-alternativ')
             return
@@ -23,18 +22,18 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
         if (fullQuiz[categoryStartIndex].questions[questionStartIndex + 1]) {
             answers.current.push(answer)
             setQuestionStartIndex(questionStartIndex + 1)
-            currentQuestion.current = fullQuiz[categoryStartIndex].questions[questionStartIndex].question;
             setUserAnswer({ id: undefined, correct: undefined })
         } else if (fullQuiz[categoryStartIndex + 1]) {
             answers.current.push(answer)
             setCategoryStartIndex(categoryStartIndex + 1)
             setQuestionStartIndex(0)
-            currentCategory.current = fullQuiz[categoryStartIndex]
-            currentQuestion.current = fullQuiz[categoryStartIndex].questions[questionStartIndex].question;
-        } else {
+        } else if(!fullQuiz[categoryStartIndex].questions[questionStartIndex + 1] && !fullQuiz[categoryStartIndex + 1]){
+            answers.current.push(answer)
+            console.log('client answer rb send serv: ', answers.current)
             await FinishQuiz(answers.current)
             alert('done')
         }
+         console.log('client answer end func useref: ', answers.current)
     }
     useEffect(() => { console.log('usrans: ', userAnswer) }, [userAnswer])
     const savedTeamName = useRef(undefined);
@@ -45,7 +44,6 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
         }
 
     }
-    useEffect(() => { }, [])
     return (
         savedTeamName.current ?
             <>
@@ -68,9 +66,14 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
                     </div>
                     <div key={`${fullQuiz[categoryStartIndex].id}-lowerContent`} className='flex h-1/3 flex-col justify-end p-2.5'>
                         <div className='flex flex-row gap-2.5'>
-                            <button onClick={() => { CycleQuestion({ team: savedTeamName.current, idQuiz: quizID, idCategory: currentCategory.current.id, idQuestion: currentQuestion.current.id, idQuestionOption: userAnswer.id, optionCorrect: userAnswer.correct }) }} key={`${fullQuiz[categoryStartIndex].id}-startButton`} className='bg-green-900 hover:bg-green-600 border-white px-1.5 border-2 rounded-b-lg h-8 w-fit items-center justify-center'>
+                            <button onClick={() => { CycleQuestion({ team: savedTeamName.current, idQuiz: quizID, idCategory: fullQuiz[categoryStartIndex].id, idQuestion: fullQuiz[categoryStartIndex].questions[questionStartIndex].id, idQuestionOption: userAnswer.id, optionCorrect: userAnswer.correct }) }} key={`${fullQuiz[categoryStartIndex].id}-startButton`} className='bg-green-900 hover:bg-green-600 border-white px-1.5 border-2 rounded-b-lg h-8 w-fit items-center justify-center'>
                                 <p key={`${fullQuiz[categoryStartIndex].id}-btnText`} className='flex flex-col justify-center text-white'>Neste spørsmål</p>
                             </button>
+                            <button onClick={() => { alert(JSON.stringify(fullQuiz)) }} key={`${fullQuiz[categoryStartIndex].id}8321-startButton`} className='bg-green-900 hover:bg-green-600 border-white px-1.5 border-2 rounded-b-lg h-8 w-fit items-center justify-center'>
+                                <p key={`${fullQuiz[categoryStartIndex].id}-btnText`} className='flex flex-col justify-center text-white'>test</p>
+                            </button>
+                            <p>categorystartIndex: {categoryStartIndex}</p>
+                            <p>questionStartIndex: {questionStartIndex}</p>
 
                         </div>
                     </div>

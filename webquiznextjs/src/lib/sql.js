@@ -125,7 +125,7 @@ export default class SQL {
      * @param {*} quizName string, quiz name
      * @param {*} description string, quiz description
      * @param {*} idUser integer, id of user importing quiz
-     * @returns 
+     * @returns IDen til quiz opprettet
      */
     static async InsertQuiz(quizName, description, idUser) {
         try {
@@ -139,7 +139,13 @@ export default class SQL {
             return 'error'
         }
     }
-    //SQL INSERT for kategorier
+    //SQL INSERT legger inn kategoriene til en quiz i databasen
+    /**
+     * 
+     * @param {*} categoryName string, category name 
+     * @param {*} parentID  integer, id of parent quiz
+     * @returns  IDen til kategori opprettet
+     */
     static async InsertCategory(categoryName, parentID) {
         try {
             const sql = neon(process.env.DATABASE_URL);
@@ -151,7 +157,13 @@ export default class SQL {
             return 'error'
         }
     }
-    //SQL INSERT for spørsmål
+    //SQL INSERT legger inn spørsmål til en kategori i databasen
+    /**
+     * 
+     * @param {*} question string, question  
+     * @param {*} parentID integer, id of parent category
+     * @returns  IDen til spørsmål opprettet
+     */
     static async InsertQuestion(question, parentID) {
         try {
             const sql = neon(process.env.DATABASE_URL);
@@ -163,7 +175,14 @@ export default class SQL {
             return 'error'
         }
     }
-    //SQL INSERT for alternativer
+    //SQL INSERT legger inn alternativer til et spørsmål i databasen
+    /**
+     * 
+     * @param {*} optionText string, option string 
+     * @param {*} correctAnswer boolean, boolen value if answer is right or wrong
+     * @param {*} parentID integer, id of parent question
+     * @returns result of INSERT query
+     */
     static async InsertOption(optionText, correctAnswer, parentID) {
         try {
             const sql = neon(process.env.DATABASE_URL);
@@ -174,23 +193,52 @@ export default class SQL {
             return 'error'
         }
     }
+    //SQL INSERT, legger inn bruker i databasenog gir tilbake IDen til brukeren som er opprettet
+    /**
+     * 
+     * @param {*} teamName string, lagnavn  
+     * @param {*} idQuiz integer, id of quiz team has done
+     * check if team exists before inserting team, because InsertAnswer is called in a loop, and it will try inserting multiple times, fail and do rollback
+     * early check stops the insert attempt that would create a duplicate
+     * @returns  id of team inserted, 
+     */
     static async InsertTeam(teamName, idQuiz) {
         try {
             const sql = neon(process.env.DATABASE_URL);
+            console.log('it1: ', teamName, idQuiz)
+            const checkForTeam = await sql.query(`SELECT "idTeam" FROM "teams" WHERE "name" = $1 AND "quizTakenID" = $2`, [String(team), Number(idQuiz)])
+            console.log('it2: ', checkForTeam)
+            if (checkForTeam[0].idTeam)
+                return checkForTeam[0].idTeam
             await sql.query(`INSERT INTO "teams" ("name", "quizTakenID") values ($1, $2)`, [String(team), Number(idQuiz)]);
             const result = await sql.query(`SELECT "idTeam" FROM "teams" WHERE "name" = $1 AND "quizTakenID" = $2`, [String(team), Number(idQuiz)])
+            console.log('it3: ', checkForTeam)
             return result[0].idTeam
+
         } catch (error) {
             // console.log('SQL error: ', error);
             return 'error'
         }
     }
     //SQL INSERT for svar fra teamNavn til spesifisert, quiz, kategori & spørsmål
-    static async InsertOption(team, idQuiz, idCategory, idQuestion, idQuestionOption, optionCorrect) {
+    /**
+     * 
+     * @param {*} team string
+     * @param {*} idQuiz integer
+     * @param {*} idCategory integer
+     * @param {*} idQuestion integer
+     * @param {*} idQuestionOption integer
+     * @param {*} optionCorrect boolean
+     * @returns result of INSERT query
+     */
+    static async InsertAnswer(team, idQuiz, idCategory, idQuestion, idQuestionOption, optionCorrect) {
         try {
+            console.log('ia1: ', team, idQuiz, idCategory, idQuestion, idQuestionOption, optionCorrect)
             const sql = neon(process.env.DATABASE_URL);
             const teamID = await this.InsertTeam(team, idQuiz);
-            const result = await sql.query(`INSERT INTO "answers" ("teamID", "parentQuestionID", "correctAnswer") values ($1, $2, $3, $4, $5, $6)`, [Number(teamID), Number(idQuiz), Number(idCategory), Number(idQuestion), Number(idQuestionOption), Boolean(optionCorrect)]);
+            console.log('ia2: ', teamID)
+            const result = await sql.query(`INSERT INTO "answers" ("teamID", "parentQuestionID", "categoryID", "questionID", "questionOptionID", "correctAnswer") values ($1, $2, $3, $4, $5, $6)`, [Number(teamID), Number(idQuiz), Number(idCategory), Number(idQuestion), Number(idQuestionOption), Boolean(optionCorrect)]);
+            console.log('ia3: ',result)
             return result
         } catch (error) {
             // console.log('SQL error: ', error);
