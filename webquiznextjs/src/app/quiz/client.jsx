@@ -1,17 +1,39 @@
 "use client"
 import { useEffect, useRef, useState } from 'react'
 
-export default function DynamicQuizClient({ SetTeamName, quizData }) {
+export default function DynamicQuizClient({ quizID, SetTeamName, quizData }) {
     const [teamName, setTeamName] = useState('')
     const [categoryStartIndex, setCategoryStartIndex] = useState(0);
     const [questionStartIndex, setQuestionStartIndex] = useState(0);
+
+    const [userAnswer, setUserAnswer] = useState({ id: undefined, correct: undefined })
     const fullQuiz = quizData;
-    function CycleQuestion() {
-
+    const currentCategory = useRef(fullQuiz[categoryStartIndex])
+    const currentQuestion = useRef(fullQuiz[categoryStartIndex].questions[questionStartIndex])
+    const answers = useRef([]);
+    function CycleQuestion(answer) {
+        if (userAnswer.id === undefined || userAnswer.correct === undefined) {
+            alert('Du må velge et svar-alternativ')
+            return
+        }
+        if (fullQuiz[categoryStartIndex].questions[questionStartIndex + 1]) {
+            answers.current.push(answer)
+            setQuestionStartIndex(questionStartIndex + 1)
+            currentQuestion.current = fullQuiz[categoryStartIndex].questions[questionStartIndex].question;
+            setUserAnswer({ id: undefined, correct: undefined })
+        } else if (fullQuiz[categoryStartIndex + 1]) {
+            answers.current.push(answer)
+            setCategoryStartIndex(categoryStartIndex + 1)
+            setQuestionStartIndex(0)
+            currentCategory.current = fullQuiz[categoryStartIndex]
+            currentQuestion.current = fullQuiz[categoryStartIndex].questions[questionStartIndex].question;
+        } else {
+            alert('done')
+        }
     }
-
+    useEffect(() => { console.log('usrans: ', userAnswer) }, [userAnswer])
     const savedTeamName = useRef(undefined);
-    async function SaveTeamname(params) {
+    async function SaveTeamname() {
         if (teamName != '') {
             await SetTeamName(teamName)
             savedTeamName.current = teamName;
@@ -22,23 +44,42 @@ export default function DynamicQuizClient({ SetTeamName, quizData }) {
     return (
         savedTeamName.current ?
             <>
-                <div key={`${fullQuiz[categoryStartIndex].id}-topDiv`} className='bg-green-700 rounded-lg  flex flex-col w-[50vw] h-[30vh] p-2.5' >
+                <div key={`${fullQuiz[categoryStartIndex].id}-topDiv`} className='bg-green-700 rounded-lg  flex flex-col w-[40vw] h-fit p-12' >
                     <div key={`${fullQuiz[categoryStartIndex].id}-upperContent`} className='flex flex-col h-1/3 p-2.5 gap-2.5'>
-                        <h1 key={`${fullQuiz[categoryStartIndex].id}-name`} className='text-3xl text-white'>{fullQuiz[categoryStartIndex].category} </h1>
+                        <h1 key={`${fullQuiz[categoryStartIndex].id}-name`} className='text-3xl text-white'>Kategori {categoryStartIndex + 1}: {fullQuiz[categoryStartIndex].category} </h1>
 
+                        <h2 key={`${fullQuiz[categoryStartIndex].id}-questionNo`} className='text-lg text-gray-300'>Spørsmål {questionStartIndex + 1}:</h2>
                         <h2 key={`${fullQuiz[categoryStartIndex].id}-description`} className='text-lg text-gray-300'>{fullQuiz[categoryStartIndex].questions[questionStartIndex].question}</h2>
                     </div>
-                    <div className='flex h-1/3 flex-col justify-end p-2.5'>
-                        {ullQuiz[categoryStartIndex].questions[questionStartIndex].options.map(()=>{})}
+                    <div className='flex flex-col h-fit gap-5 text-white p-5'>
+                        {fullQuiz[categoryStartIndex].questions[questionStartIndex].options.map((option) => (
+
+                            <div key={`${option.id}-container`} id={`${option.id}-${fullQuiz[categoryStartIndex].questions[questionStartIndex].id}`}>
+                                <input key={`${option.id}-${fullQuiz[categoryStartIndex].questions[questionStartIndex].id}-input`} value={option.correct} onChange={() => { setUserAnswer({ id: option.id, correct: option.correct }) }} type='radio' name={`${fullQuiz[categoryStartIndex].questions[questionStartIndex].idQuestion}`} id={`${option.id}-${fullQuiz[categoryStartIndex].questions[questionStartIndex].id}`} />
+                                <label key={`${option.correct}-${option.id}-label`} id={`${option.correct}-${option.id}`} className='p-2' htmlFor={`${option.id}-${fullQuiz[categoryStartIndex].questions[questionStartIndex].id}`}>{option.text}</label>
+                            </div>
+
+                        ))}
                     </div>
                     <div key={`${fullQuiz[categoryStartIndex].id}-lowerContent`} className='flex h-1/3 flex-col justify-end p-2.5'>
                         <div className='flex flex-row gap-2.5'>
-                            <button onClick={() => {  }} key={`${quiz.idQuiz}-startButton`} className='bg-green-900 hover:bg-green-600 border-white border-2 rounded-b-lg h-8 w-32 items-center justify-center'>
-                                <p key={`${fullQuiz[categoryStartIndex].id}-btnText`} className='flex flex-col justify-center text-white'>Start</p>
+                            <button onClick={() => { CycleQuestion({ team: savedTeamName.current, idQuiz: quizID, idCategory: currentCategory.current.id, idQuestion: currentQuestion.current.id, idQuestionOption: userAnswer.id, optionCorrect: userAnswer.correct }) }} key={`${fullQuiz[categoryStartIndex].id}-startButton`} className='bg-green-900 hover:bg-green-600 border-white px-1.5 border-2 rounded-b-lg h-8 w-fit items-center justify-center'>
+                                <p key={`${fullQuiz[categoryStartIndex].id}-btnText`} className='flex flex-col justify-center text-white'>Neste spørsmål</p>
                             </button>
 
                         </div>
                     </div>
+                </div>
+                <div className='flex flex-row gap-8'>
+                    {answers.current.length >= 1 && answers.current.map(answer => (
+                        <div id={answer.key}>
+                            <div id={answer.idQuiz}>{answer.idQuiz}</div>
+                            <div id={answer.idCategory}>{answer.idCategory}</div>
+                            <div id={answer.iidQuestionQuiz}>{answer.idQuestion}</div>
+                            <div id={answer.idQuestionOptionQuiz}>{answer.idQuestionOption}</div>
+                            <div id={String(answer.optionCorrect)}>{String(answer.optionCorrect)}</div>
+                        </div>
+                    ))}
                 </div>
             </>
             :

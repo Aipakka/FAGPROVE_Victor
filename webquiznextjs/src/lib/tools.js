@@ -113,7 +113,7 @@ async function ContrustQuestionOptions(question) {
     if (!Array.isArray(options) && options !== undefined && options !== null)
         options = [options];
     for (const option of options) {
-        questionStructure.push({ text: option.optionText, id:option.idQuestionOption, correct: option.correct });
+        questionStructure.push({ text: option.optionText, id:option.idQuestionOption, correct: option.correctAnswer });
     }
     return questionStructure;
 }
