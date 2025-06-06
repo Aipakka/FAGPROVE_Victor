@@ -1,0 +1,78 @@
+[
+    {
+        "quizName": "farger",
+        "description": "quiz om farger",
+        "categories": [
+            {
+                "categoryName": "Blanding av farger",
+                "questions": [
+                    {
+                        "question": "Hvordan lager du lilla?",
+                        "answers": [
+                            {
+                                "text": "Rød og blå",
+                                "correct": true
+                            },
+                            {
+                                "text": "Svart og hvit",
+                                "correct": false
+                            },
+                            {
+                                "text": "Gul og oransje",
+                                "correct": false
+                            }
+                        ]
+                    },
+                    {
+                        "question": "Hvordan lager du oransje?",
+                        "answers": [
+                            {
+                                "text": "Blå og lilla",
+                                "correct": false
+                            },
+                            {
+                                "text": "Gul og rød",
+                                "correct": true
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "categoryName": "Farge på objekter",
+                "questions": [
+                    {
+                        "question": "Hvilken farge har bananer",
+                        "answers": [
+                            {
+                                "text": "Gul",
+                                "correct": true
+                            },
+                            {
+                                "text": "Blå",
+                                "correct": false
+                            },
+                            {
+                                "text": "Svart",
+                                "correct": false
+                            }
+                        ]
+                    },
+                    {
+                        "question": "Hvilken farge er himmelen?",
+                        "answers": [
+                            {
+                                "text": "Den har ikke farge",
+                                "correct": true
+                            },
+                            {
+                                "text": "Blå",
+                                "correct": false
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
