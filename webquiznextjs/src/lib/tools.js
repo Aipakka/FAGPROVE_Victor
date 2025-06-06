@@ -3,19 +3,22 @@ import { getIronSession } from 'iron-session';
 import bcrypt from "bcrypt"
 import SQL from './sql';
 import { cookies } from 'next/headers';
-//Logger inn bruker
-//henter ut passord hash Basert på brukernavn skrevet inn
-//dette må bli gjort for at hashen skal bli den samme når hashen blir sjekket
-//blir gjort gjennom bcrypt.compare(passord, hash)
-//om loginn er valid setter session gjennom iron-session 
+/**
+ * Logger inn bruker
+ * @param {*} username string, brukernavn fra client
+ * @param {*} password  string, password fra client
+ * @returns status på hvordan kjøring av funksjonen gikk
+ */
+
 export async function VerifyLoginn(username, password) {
+    //henter passord hash fra brukernavn i tabellen "users"
     const dbPassword = await SQL.GetUserPassword(username);
     if (!dbPassword[0].passwordHash)
         return 'noUserFound';
     const passwordHash = dbPassword[0].passwordHash;
-
+    //sammenligner hash i databasen med passord bruker skrev inn på client
     if (await bcrypt.compare(password, passwordHash)) {
-
+        //henter full bruker fra SQL
         const userData = await SQL.GetUserWithUserAndPass(username, passwordHash);
         if (userData === 'error')
             return 'sqlErr'
@@ -28,7 +31,7 @@ export async function VerifyLoginn(username, password) {
                     maxAge: 60 * 30
                 }
             });
-
+            //setter verdier knyttet til loginn info
             //session verdier, session."variabelNavn" blir opprettet av session om det ikke eksisterer
             session.idUser = userData[0].idUsers;
             session.admin = userData[0].admin;
@@ -67,7 +70,7 @@ export async function VerifyLoginn(username, password) {
     }
 ]
 /**
- * 
+ * konstruerer data struktuer for quizen som blir vist til bruker på client
  * @param {*} quizid id for the quiz to be constructed 
  * @returns categories and all children needed to render quiz for user
  */
@@ -87,7 +90,7 @@ export async function ConstructQuizLoop(quizid) {
     }
 }
 /**
- * 
+ * Konstruerer data brukt til ConstructQuizLoop()
  * @param {*} category category to gather questions from
  * @returns questions to the related category
  */
@@ -102,7 +105,7 @@ async function ConstructCategoryQuestion(category) {
     return categoryStructure;
 }
 /**
- * 
+ * konstruerer data brukt til ConstructCategoryQuestion()
  * @param {*} question question to gather the options to
  * @returns  options to the related question
  */
@@ -117,17 +120,21 @@ async function ContrustQuestionOptions(question) {
     return questionStructure;
 }
 
-
+/**
+ * Leser inn JSON fil i databasen
+ * @param {*} quizList JSON, dataen som blir lest inn fra JSON fil admin laster opp fra client
+ * @returns 
+ */
 export async function InsertQuizLoop(quizList) {
     try {
         if (!Array.isArray(quizList) && quizList !== undefined && quizList !== null)
             quizList = [quizList];
         const res = await QuizezInList(quizList)
-        console.log('ressss, ', res)
+        // console.log('ressss, ', res)
 
-        if (res?.error) {
-            return res
-        } else
+        // if (res?.error) {
+        //     return res
+        // } else
             return 'fileReadToDBsuccess'
     } catch (error) {
         return error
@@ -135,7 +142,11 @@ export async function InsertQuizLoop(quizList) {
 
 
 }
-//legger til alle quizer fra fil i databasen
+/**
+ * 
+ * @param {*} quizList JSON, dataen som blir lest inn fra JSON fil admin laster opp fra client
+ * @returns 
+ */
 async function QuizezInList(quizList) {
     try {
         let errorStuff = [];
@@ -151,21 +162,21 @@ async function QuizezInList(quizList) {
             if (!Array.isArray(quiz.categories) && quiz.categories !== undefined && quiz.categories !== null)
                 quiz.categories = [quiz.categories];
             let quizID = await SQL.InsertQuiz(quiz.quizName, quiz.description, session.idUser)
-            if (quizID?.error) {
-                console.log('quizid: ', quizID)
-                errorStuff.push(quizID.error);
-                console.log('errstuffloop: ', errorStuff)
-            }
+            // if (quizID?.error) {
+            //     console.log('quizid: ', quizID)
+            //     errorStuff.push(quizID.error);
+            //     console.log('errstuffloop: ', errorStuff)
+            // }
             await CategoriesInQuiz(quiz, quizID);
 
         });
-        console.log('errstuff: ', errorStuff)
+        // console.log('errstuff: ', errorStuff)
 
-        if (errorStuff?.error) {
-            console.log('errstuff: ', errorStuff)
-            return errorStuff
+        // if (errorStuff?.error) {
+        //     console.log('errstuff: ', errorStuff)
+        //     return errorStuff
 
-        }
+        // }
     } catch (error) {
         console.log('funk errrrr: ', error)
         return (error)

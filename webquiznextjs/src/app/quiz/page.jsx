@@ -4,6 +4,11 @@ import { cookies } from 'next/headers';
 import { getIronSession } from 'iron-session';
 import SQL from '@/lib/sql';
 
+/**
+ * render av siden, dette er funksjonen som blir kalt
+ * bruker client.jsx på samme nivå som komponent for å rendere allt bruker ser å bruker
+ * @returns render av client content
+ */
 export default async function DynamicQuizServer({ params }) {
     async function ServerWrapperdestroySession() {
         "use server"

@@ -2,26 +2,36 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 export default function ClientIndex({ GetQuizez, StartQuiz }) {
+  /**
+       * useState verdier laster siden delvis på nytt når verdien deres oppdateres
+       * Er derofr brukt på verdier som bestemmer om f.eks modaler skal vises
+       * useRef er brukt for verdier som ikke trenger at det brukeren ser oppdateres
+       */
   const router = useRouter();
   const allQuizez = useRef([])
   const [shownQuizez, setshownQuizez] = useState([])
 
+  /**
+   * starter quiz for bruker
+   * @param {*} quizid integer, id til quiz bruker starter 
+   */
   async function RouteToQUiz(quizid) {
+    //server funksjon
+    let res = await StartQuiz(quizid);
+    if (res === 'success')
+      router.push('quiz');
 
-      let res = await StartQuiz(quizid);
-      if (res === 'success')
-        router.push('quiz');
-    
   }
-
-  //henter quizer fra serverSide og DB, og looper over dem og returner html elementer med navn, description og knapp for å starte
+  /**
+   *  henter quizer fra serverSide og DB, og looper over dem og returner html elementer med navn, description og knapp for å starte 
+   */
   async function GetServerQuizez() {
     //henter quiz data fra serverside
     const res = await GetQuizez();
     allQuizez.current = res;
     //looper over quizer fra serverside og lager HTML
     setshownQuizez(allQuizez.current.map(quiz =>
-      <div key={`${quiz.idQuiz}-topDiv`} className='bg-green-700 rounded-lg  flex flex-col w-[100vw] lg:w-[50vw] h-[20vh] p-2.5' >
+      <div key={`${quiz.idQuiz}-topDiv`} className='bg-green-700 rounded-lg  flex flex-col w-[90vw] lg:w-[50vw] h-[20vh] p-2.5' >
         <div key={`${quiz.idQuiz}-upperContent`} className='flex flex-col h-1/2 p-2.5 gap-2.5'>
           <h1 key={`${quiz.idQuiz}-name`} className='text-3xl text-white'>{quiz.quizName} </h1>
 
@@ -39,7 +49,9 @@ export default function ClientIndex({ GetQuizez, StartQuiz }) {
         </div>
       </div>))
   }
-
+  /**
+   * kjører en gang når siden lastes for å hente quizer fra serverside
+   */
   useEffect(() => {
     GetServerQuizez();
 

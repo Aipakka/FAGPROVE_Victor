@@ -11,7 +11,13 @@ export default class SQL {
             return 'error'
         }
     }
-    //SQL for å opprette brukere i DB, vil ikke være en del av nettsiden funksjonalitet med mindre den utvides til brukere med loginn
+    /**
+     *     SQL for å opprette brukere i DB, vil ikke være en del av nettsiden funksjonalitet med mindre den utvides til brukere med loginn
+     * @param {*} username string
+     * @param {*} passwordHash string, bcrypt hash
+     * @param {*} admin boolean
+     * @returns bruker opprettet
+     */
     static async LagBruker(username, passwordHash, admin) {
 
         try {
@@ -24,7 +30,12 @@ export default class SQL {
             return 'error'
         }
     }
-    //SQL SELECT for å hente bruker fra databasen
+    /**
+     *     //SQL SELECT for å hente bruker fra databasen
+     * @param {*} username string 
+     * @param {*} passwordHash string, bcrypt hash
+     * @returns bruker data fra DB
+     */
     static async GetUserWithUserAndPass(username, passwordHash) {
         try {
             const sql = neon(process.env.DATABASE_URL);
@@ -35,7 +46,11 @@ export default class SQL {
             return 'error'
         }
     }
-    //SQL SELECT for å hente brukers passord fra databasen, for å verifisere loginn
+    /**
+     *     SQL SELECT for å hente brukers passord fra databasen, for å verifisere loginn
+     * @param {*} username string
+     * @returns  brukers passord hash, brukt i bcrypt.compare
+     */
     static async GetUserPassword(username) {
         try {
             const sql = neon(process.env.DATABASE_URL);
@@ -47,7 +62,11 @@ export default class SQL {
             return 'error'
         }
     }
-    //SQL SELECT for å hente brukers navn fra databasen, basert på id
+    /**
+     *     //SQL SELECT for å hente brukers navn fra databasen, basert på id
+     * @param {*} idUser integer
+     * @returns username fra db
+     */
     static async GetUserFromID(idUser) {
         try {
             const sql = neon(process.env.DATABASE_URL);
@@ -59,8 +78,10 @@ export default class SQL {
             return 'error'
         }
     }
-
-    //SQL SELECT henter alle quizer
+    /**
+     *     //SQL SELECT henter alle quizer
+     * @returns quizer fr db
+     */
     static async GetQuizes() {
         try {
             const sql = neon(process.env.DATABASE_URL);
@@ -132,13 +153,13 @@ export default class SQL {
         try {
             console.log('InsertQuiz: ', quizName, description, idUser)
             const sql = neon(process.env.DATABASE_URL);
-            const insertRes =await sql.query(`INSERT INTO "quiz" ("quizName", "description", "createdByUser") values ($1, $2, $3)`, [String(quizName), String(description), Number(idUser)]);
+            const insertRes = await sql.query(`INSERT INTO "quiz" ("quizName", "description", "createdByUser") values ($1, $2, $3)`, [String(quizName), String(description), Number(idUser)]);
             console.log('insrtRes', insertRes)
             const result = await sql.query(`SELECT "idQuiz" FROM "quiz" WHERE "quizName" = $1 AND "description" = $2`, [String(quizName), String(description)])
             return result[0].idQuiz
         } catch (error) {
             console.log('SQL error: ', error.detail);
-            return {error: error.detail}
+            return { error: error.detail }
         }
     }
     //SQL INSERT legger inn kategoriene til en quiz i databasen

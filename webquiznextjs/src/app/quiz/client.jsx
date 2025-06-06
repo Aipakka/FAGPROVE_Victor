@@ -3,6 +3,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation';
 
 export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, quizData, destroySession }) {
+    /**
+     * useState verdier laster siden delvis på nytt når verdien deres oppdateres
+     * Er derofr brukt på verdier som bestemmer om f.eks modaler skal vises
+     * useRef er brukt for verdier som ikke trenger at det brukeren ser oppdateres
+     */
     const [teamName, setTeamName] = useState('')
     const [categoryStartIndex, setCategoryStartIndex] = useState(0);
     const [questionStartIndex, setQuestionStartIndex] = useState(0);
@@ -12,9 +17,14 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
     const fullQuiz = quizData;
     const answers = useRef([]);
 
-    //sjekker om brukeren har avgitt svaret sitt
-    //Sjekker om det er et neste spørsmål i kategorien eller om den må gå til neste kategori og begynne på spørsmålene der.
-    //lagrer svar fra Bruker som blir sendt til funksjonen som parameter i variabel answers
+    /**
+     *
+    sjekker om brukeren har avgitt svaret sitt
+    Sjekker om det er et neste spørsmål i kategorien eller om den må gå til neste kategori og begynne på spørsmålene der.
+    lagrer svar fra Bruker som blir sendt til funksjonen som parameter i variabel answers
+     * @param {*} answer 
+     * @returns 
+     */
     async function CycleQuestion(answer) {
         if (userAnswer.id === undefined || userAnswer.correct === undefined) {
             alert('Du må velge et svar-alternativ')
@@ -35,6 +45,10 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
         }
     }
     const savedTeamName = useRef(undefined);
+
+    /**
+     * lagrer lagnavn bruker valgte
+     */
     async function SaveTeamname() {
         if (teamName != '') {
             let res = await SetTeamName(teamName)
@@ -44,13 +58,16 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
         }
 
     }
+    /**
+     * sender kall til server om å ødelegge session og går da til startside og stopper quiz
+     */
     async function destroy() {
         await destroySession();
         router.replace('/');
     }
     return (
         savedTeamName.current ? finished ?
-            <div className='flex justify-center items-center  [40vw] bg-green-700 rounded-lg opacity-100 text-white flex-col'>
+            <div className='flex justify-center items-center w-[90vw] xl:w-[40vw] bg-green-700 rounded-lg opacity-100 text-white flex-col'>
                 <h1 className='m-10 text-2xl'>GRATULERER!!!!</h1>
                 <h2 className='m-10 text-lg text-center'> Du får deltager premie i form av ASCII art av en orm.<br /> Vinner er konfidensielt avholdt til Admin.<br />
                     ____/¨
@@ -61,7 +78,7 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
             </div>
             :
             <>
-                <div key={`${fullQuiz[categoryStartIndex].id}-topDiv`} className='bg-green-700 rounded-lg  flex flex-col w-[40vw] h-fit p-12' >
+                <div key={`${fullQuiz[categoryStartIndex].id}-topDiv`} className='bg-green-700 rounded-lg  flex flex-col w-[90vw] lg:w-[40vw] h-fit p-12' >
                     <div key={`${fullQuiz[categoryStartIndex].id}-upperContent`} className='flex flex-col h-1/3 p-2.5 gap-2.5'>
                         <h1 key={`${fullQuiz[categoryStartIndex].id}-name`} className='text-3xl text-white'>Kategori {categoryStartIndex + 1}: {fullQuiz[categoryStartIndex].category} </h1>
 
@@ -91,7 +108,7 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
             </>
             :
             <>
-                <div className='flex justify-center items-center  w-1/5 bg-green-700 rounded-lg opacity-100 text-white flex-col'>
+                <div className='flex justify-center items-center w-[90vw] md:w-1/5 bg-green-700 rounded-lg opacity-100 text-white flex-col'>
                     <h1 className='m-10 text-2xl'>Velg Lagnavn</h1>
                     <div className='w-4/5 lg:w-3/5  xl:w-2/5'> Lagnavn<br />
                         <input type={'text'} value={teamName} onChange={(e) => setTeamName(e.target.value)} className='p-1 text-gray-600 rounded-lg bg-amber-50 outline-gray-800 outline w-full ' placeholder={'Lagnavn'} />
