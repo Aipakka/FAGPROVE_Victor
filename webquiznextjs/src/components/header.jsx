@@ -114,7 +114,7 @@ export default function Header({ readFileToDB, inQuiz, adminName, admin = false,
     function loginModal() {
         return (
             <>
-                <div className='absolute flex items-center justify-center w-[100vw] h-[100vh]'>
+                <div className='absolute flex items-center justify-center w-full h-full '>
                     <div className='flex justify-center items-center z-20 absolute w-1/3 bg-white rounded-lg opacity-100 flex-col'>
                         <h1 className='m-10 text-2xl'>Innlogging</h1>
                         <div className='w-4/5 lg:w-3/5  xl:w-2/5'> Brukernavn<br />
@@ -139,7 +139,7 @@ export default function Header({ readFileToDB, inQuiz, adminName, admin = false,
     function filModal() {
         return (
             <>
-                <div className='absolute flex items-center justify-center w-[100vw] h-[100vh]'>
+                <div className='absolute flex items-center justify-center w-full h-full'>
                     <div className='flex justify-center items-center z-20 absolute w-1/3 bg-white rounded-lg opacity-100 flex-col'>
                         <h1 className='m-10 text-2xl'>Les inn fil</h1>
                         <input onChange={(e) => setFile(e.target.files[0])} accept='.json' type='file' className='p-2 rounded-lg bg-green-900 hover:bg-green-600 text-white' />

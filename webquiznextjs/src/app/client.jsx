@@ -21,7 +21,7 @@ export default function ClientIndex({ GetQuizez, StartQuiz }) {
     allQuizez.current = res;
     //looper over quizer fra serverside og lager HTML
     setshownQuizez(allQuizez.current.map(quiz =>
-      <div key={`${quiz.idQuiz}-topDiv`} className='bg-green-700 rounded-lg  flex flex-col w-[50vw] h-[30vh] p-2.5' >
+      <div key={`${quiz.idQuiz}-topDiv`} className='bg-green-700 rounded-lg  flex flex-col w-[50vw] h-[20vh] p-2.5' >
         <div key={`${quiz.idQuiz}-upperContent`} className='flex flex-col h-1/2 p-2.5 gap-2.5'>
           <h1 key={`${quiz.idQuiz}-name`} className='text-3xl text-white'>{quiz.quizName} </h1>
 
@@ -46,8 +46,8 @@ export default function ClientIndex({ GetQuizez, StartQuiz }) {
   }, [])
 
   return (
-    <>
+    <div className='flex flex-col gap-8'>
       {shownQuizez}
-    </>
+    </div>
   )
 }
