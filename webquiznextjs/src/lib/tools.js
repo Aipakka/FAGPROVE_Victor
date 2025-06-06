@@ -35,7 +35,6 @@ export async function VerifyLoginn(username, password) {
             await session.save();
             return 'loginnSuccess'
         } catch (error) {
-            console.log(error)
             return 'sessionErr'
         }
     } else {
@@ -80,7 +79,7 @@ export async function ConstructQuizLoop(quizid) {
             categories = [categories];
         for (const category of categories) {
 
-            quizStructure.push({ category: category.categoryName, id:category.idCategories, questions: await ConstructCategoryQuestion(category) })
+            quizStructure.push({ category: category.categoryName, id: category.idCategories, questions: await ConstructCategoryQuestion(category) })
         }
         return quizStructure
     } catch (error) {
@@ -113,7 +112,7 @@ async function ContrustQuestionOptions(question) {
     if (!Array.isArray(options) && options !== undefined && options !== null)
         options = [options];
     for (const option of options) {
-        questionStructure.push({ text: option.optionText, id:option.idQuestionOption, correct: option.correctAnswer });
+        questionStructure.push({ text: option.optionText, id: option.idQuestionOption, correct: option.correctAnswer });
     }
     return questionStructure;
 }
@@ -123,8 +122,13 @@ export async function InsertQuizLoop(quizList) {
     try {
         if (!Array.isArray(quizList) && quizList !== undefined && quizList !== null)
             quizList = [quizList];
-        await QuizezInList(quizList)
-        return 'fileReadToDBsuccess'
+        const res = await QuizezInList(quizList)
+        console.log('ressss, ', res)
+
+        if (res?.error) {
+            return res
+        } else
+            return 'fileReadToDBsuccess'
     } catch (error) {
         return error
     }
@@ -134,6 +138,7 @@ export async function InsertQuizLoop(quizList) {
 //legger til alle quizer fra fil i databasen
 async function QuizezInList(quizList) {
     try {
+        let errorStuff = [];
         const userCookies = await cookies();
         const session = await getIronSession(userCookies, {
             password: process.env.SESSION_PWD,
@@ -146,10 +151,23 @@ async function QuizezInList(quizList) {
             if (!Array.isArray(quiz.categories) && quiz.categories !== undefined && quiz.categories !== null)
                 quiz.categories = [quiz.categories];
             let quizID = await SQL.InsertQuiz(quiz.quizName, quiz.description, session.idUser)
+            if (quizID?.error) {
+                console.log('quizid: ', quizID)
+                errorStuff.push(quizID.error);
+                console.log('errstuffloop: ', errorStuff)
+            }
             await CategoriesInQuiz(quiz, quizID);
 
         });
+        console.log('errstuff: ', errorStuff)
+
+        if (errorStuff?.error) {
+            console.log('errstuff: ', errorStuff)
+            return errorStuff
+
+        }
     } catch (error) {
+        console.log('funk errrrr: ', error)
         return (error)
     }
 }

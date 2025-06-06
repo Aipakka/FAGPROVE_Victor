@@ -71,6 +71,7 @@ export default class SQL {
             return 'error'
         }
     }
+
     //SQL SELECT quiz categories
     /**
      * 
@@ -131,12 +132,13 @@ export default class SQL {
         try {
             console.log('InsertQuiz: ', quizName, description, idUser)
             const sql = neon(process.env.DATABASE_URL);
-            await sql.query(`INSERT INTO "quiz" ("quizName", "description", "createdByUser") values ($1, $2, $3)`, [String(quizName), String(description), Number(idUser)]);
+            const insertRes =await sql.query(`INSERT INTO "quiz" ("quizName", "description", "createdByUser") values ($1, $2, $3)`, [String(quizName), String(description), Number(idUser)]);
+            console.log('insrtRes', insertRes)
             const result = await sql.query(`SELECT "idQuiz" FROM "quiz" WHERE "quizName" = $1 AND "description" = $2`, [String(quizName), String(description)])
             return result[0].idQuiz
         } catch (error) {
-            // console.log('SQL error: ', error);
-            return 'error'
+            console.log('SQL error: ', error.detail);
+            return {error: error.detail}
         }
     }
     //SQL INSERT legger inn kategoriene til en quiz i databasen
@@ -241,6 +243,12 @@ export default class SQL {
     }
 
     //SQL SELECT checks if user team has answered quiz already
+    /**
+     * 
+     * @param {*} teamName string, lagnavn fra bruker 
+     * @param {*} idQuiz integer, id til quiz gjort av bruker
+     * @returns 
+     */
     static async CheckCompletion(teamName, idQuiz) {
         try {
             const sql = neon(process.env.DATABASE_URL);
@@ -248,10 +256,32 @@ export default class SQL {
             console.log('teamCheck: ', checkForTeam)
             let answerCheckRes = undefined;
             if (checkForTeam[0]?.idTeam) {
-                answerCheckRes = await sql.query(`SELECT * FROM "answers" WHERE "quizID" = $1 AND "teamID" = $2`, [ Number(idQuiz), Number(checkForTeam[0].idTeam)])
+                answerCheckRes = await sql.query(`SELECT * FROM "answers" WHERE "quizID" = $1 AND "teamID" = $2`, [Number(idQuiz), Number(checkForTeam[0].idTeam)])
                 return answerCheckRes
             }
             else return 'noTeam'
+
+        } catch (error) {
+
+        }
+    }
+    //SQL SELECT henter svar til quiz
+    static async GetAnswers(idQuiz) {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            const res = await sql.query(`SELECT * FROM "answers" WHERE "quizID" = $1  `, [Number(idQuiz)])
+            return res
+
+        } catch (error) {
+
+        }
+    }
+
+    static async GetUsersCompleted(idQuiz) {
+        try {
+            const sql = neon(process.env.DATABASE_URL);
+            const res = await sql.query(`SELECT * FROM "teams" WHERE "quizTakenID" = $1  `, [Number(idQuiz)])
+            return res
 
         } catch (error) {
 

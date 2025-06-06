@@ -18,6 +18,7 @@ export default async function RootLayout({ children }) {
   async function ServerWrapperInsertQuizLoop(quizlist) {
     "use server"
     const res = await InsertQuizLoop(quizlist);
+ 
     return res
   }
   async function ServerWrapperdestroySession() {
@@ -42,7 +43,6 @@ export default async function RootLayout({ children }) {
     }
   })
   const admName = await SQL.GetUserFromID(session.idUser)
-  // console.log('admnm: ', admName)
   return (
     <html lang="en" >
 

@@ -61,6 +61,10 @@ export default function Header({ readFileToDB, inQuiz, adminName, admin = false,
     }
     async function uploadFile() {
         const res = await readFileToDB(fileRead.current);
+        console.log('clie res: ', res)
+        if (res?.error) {
+            alert(res.error)
+        }
         if (res === 'fileReadToDBsuccess') {
             fileRead.current = [];
             setFile(undefined);

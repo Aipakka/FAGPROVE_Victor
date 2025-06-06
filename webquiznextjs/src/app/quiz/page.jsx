@@ -20,12 +20,8 @@ export default async function DynamicQuizServer({ params }) {
 
     async function ServerFinishQuiz(answers) {
         "use server"
-        console.log('ansrs: ', answers)
         for (const answer of answers) {
-            console.log('for ansr: ', answer)
             let res = await SQL.InsertAnswer(answer.team, answer.idQuiz, answer.idCategory, answer.idQuestion, answer.idQuestionOption, answer.optionCorrect)
-            console.log('sql res, ', res)
-
         };
     }
     async function SetTeamName(teamname) {

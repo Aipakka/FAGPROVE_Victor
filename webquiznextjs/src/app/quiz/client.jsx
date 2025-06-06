@@ -16,7 +16,6 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
     //Sjekker om det er et neste spørsmål i kategorien eller om den må gå til neste kategori og begynne på spørsmålene der.
     //lagrer svar fra Bruker som blir sendt til funksjonen som parameter i variabel answers
     async function CycleQuestion(answer) {
-        console.log('client answer: ', answer)
         if (userAnswer.id === undefined || userAnswer.correct === undefined) {
             alert('Du må velge et svar-alternativ')
             return
@@ -31,13 +30,10 @@ export default function DynamicQuizClient({ FinishQuiz, quizID, SetTeamName, qui
             setQuestionStartIndex(0)
         } else if (!fullQuiz[categoryStartIndex].questions[questionStartIndex + 1] && !fullQuiz[categoryStartIndex + 1]) {
             answers.current.push(answer)
-            console.log('client answer rb send serv: ', answers.current)
             await FinishQuiz(answers.current)
             setFinished(true);
         }
-        console.log('client answer end func useref: ', answers.current)
     }
-    useEffect(() => { console.log('usrans: ', userAnswer) }, [userAnswer])
     const savedTeamName = useRef(undefined);
     async function SaveTeamname() {
         if (teamName != '') {
