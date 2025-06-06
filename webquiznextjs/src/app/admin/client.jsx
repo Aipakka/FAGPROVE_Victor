@@ -10,6 +10,7 @@ export default function AdminClient({ getResults, getQuizez }) {
         allQuizez.current = res;
     }
     async function getServerResults(idQuiz, quizName) {
+        quizResults.current = [];
         const res = await getResults(idQuiz, quizName);
         quizResults.current = res;
         console.log('cl res: ', quizResults.current)
@@ -23,7 +24,7 @@ export default function AdminClient({ getResults, getQuizez }) {
     }, [])
 
     return (
-        <>
+        <div className='flex flex-col gap-8'>
             {allQuizez.current.map(quiz =>
                 <div key={`${quiz.idQuiz}-topDiv`} className='bg-green-700 rounded-lg text-white flex flex-col w-[50vw] h-fit p-2.5' >
                     <div key={`${quiz.idQuiz}-upperContent`} className='flex flex-col h-1/3 p-2.5 gap-2.5'>
@@ -65,6 +66,6 @@ export default function AdminClient({ getResults, getQuizez }) {
                         </button>
                     </div>
                 </div>)}
-        </>
+        </div>
     )
 }

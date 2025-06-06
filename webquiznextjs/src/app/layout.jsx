@@ -18,7 +18,7 @@ export default async function RootLayout({ children }) {
   async function ServerWrapperInsertQuizLoop(quizlist) {
     "use server"
     const res = await InsertQuizLoop(quizlist);
- 
+
     return res
   }
   async function ServerWrapperdestroySession() {
